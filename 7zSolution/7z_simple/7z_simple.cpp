@@ -5,11 +5,12 @@
 #include "7zAlloc.h"
 #include "7zCrc.h"
 #include "7zFile.h"
+#include "7zBuf.h"
 #include "7zVersion.h"
 
 struct scoped_currentdirectory
 {
-	scoped_currentdirectory(LPCTSTR temp_current_dir)
+	scoped_currentdirectory(wchar_t const* temp_current_dir)
 	{
 		::GetCurrentDirectory(MAX_PATH, origin_current_dir);
 		::SetCurrentDirectory(temp_current_dir);
@@ -288,14 +289,37 @@ int decompress_by_path(wchar_t const* archieve_path, wchar_t const* target_dir)
 {
 	CSzFile archieve_file;
 	WRes result = InFile_OpenW(&archieve_file, archieve_path);
+	
 	if(0 != result) return result;
 
-	return decompress_by_handle(archieve_file, target_dir);
+	result = decompress_by_handle(archieve_file, target_dir);
+
+	File_Close(&archieve_file);
+
+	return result;
 }
 
 int decompress_by_handle(CSzFile archieve_file, wchar_t const* target_dir)
 {
 	CFileInStream archiveStream;
+	archiveStream.file = archieve_file;
+	FileInStream_CreateVTable(&archiveStream);
+	return decompress_by_stream(&archiveStream.s, target_dir);
+}
+
+int decompress_by_buffer( void* archieve_buf, size_t archieve_size, wchar_t const* target_dir )
+{
+	CBufInStream bufStream;
+	BufInStream_CreateVTable(&bufStream);
+	bufStream.buf.data = (Byte*)archieve_buf;
+	bufStream.buf.pos = 0;
+	bufStream.buf.size = archieve_size;
+
+	return decompress_by_stream(&bufStream.s, target_dir);
+}
+
+int decompress_by_stream( ISeekInStream* archieve_stream, wchar_t const* target_dir )
+{
 	CLookToRead lookStream;
 	CSzArEx db;
 	SRes res;
@@ -312,17 +336,14 @@ int decompress_by_handle(CSzFile archieve_file, wchar_t const* target_dir)
 	allocTempImp.Alloc = SzAllocTemp;
 	allocTempImp.Free = SzFreeTemp;
 
-	archiveStream.file = archieve_file;
-
-	FileInStream_CreateVTable(&archiveStream);
 	LookToRead_CreateVTable(&lookStream, False);
   
-	lookStream.realStream = &archiveStream.s;
+	lookStream.realStream = archieve_stream;
 	LookToRead_Init(&lookStream);
 
 	CrcGenerateTable();
 
-	scoped_currentdirectory tmp_set_curdir(target_dir);
+	scoped_currentdirectory tmp_set_curdir((LPCTSTR)target_dir);
 
 	SzArEx_Init(&db);
 	res = SzArEx_Open(&db, &lookStream.s, &allocImp, &allocTempImp);
@@ -424,16 +445,15 @@ int decompress_by_handle(CSzFile archieve_file, wchar_t const* target_dir)
 		IAlloc_Free(&allocImp, outBuffer);
 	}
 
-
 	SzArEx_Free(&db, &allocImp);
 	SzFree(NULL, temp);
 
-	File_Close(&archiveStream.file);
 	if (res == SZ_OK)
 	{
 		printf("\nEverything is Ok\n");
 		return 0;
 	}
+
 	if (res == SZ_ERROR_UNSUPPORTED)
 		PrintError("decoder doesn't support this archive");
 	else if (res == SZ_ERROR_MEM)
@@ -444,3 +464,4 @@ int decompress_by_handle(CSzFile archieve_file, wchar_t const* target_dir)
 	printf("\nERROR #%d\n", res);
 	return 1;
 }
+

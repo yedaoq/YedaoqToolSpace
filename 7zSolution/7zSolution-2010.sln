@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "7z_simple", "7z_simple\7z_simple.vcxproj", "{29B55739-B92E-4D72-A9D3-B992F82F5AD5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "7z_simple_demo_mfc", "7z_simple_demo_mfc\7z_simple_demo_mfc.vcxproj", "{EA265D39-1B7F-4F99-9BB9-D55345980510}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{29B55739-B92E-4D72-A9D3-B992F82F5AD5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{29B55739-B92E-4D72-A9D3-B992F82F5AD5}.Debug|Win32.Build.0 = Debug|Win32
+		{29B55739-B92E-4D72-A9D3-B992F82F5AD5}.Release|Win32.ActiveCfg = Release|Win32
+		{29B55739-B92E-4D72-A9D3-B992F82F5AD5}.Release|Win32.Build.0 = Release|Win32
+		{EA265D39-1B7F-4F99-9BB9-D55345980510}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EA265D39-1B7F-4F99-9BB9-D55345980510}.Debug|Win32.Build.0 = Debug|Win32
+		{EA265D39-1B7F-4F99-9BB9-D55345980510}.Release|Win32.ActiveCfg = Release|Win32
+		{EA265D39-1B7F-4F99-9BB9-D55345980510}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

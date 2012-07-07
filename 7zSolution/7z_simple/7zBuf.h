@@ -32,6 +32,16 @@ void DynBuf_SeekToBeg(CDynBuf *p);
 int DynBuf_Write(CDynBuf *p, const Byte *buf, size_t size, ISzAlloc *alloc);
 void DynBuf_Free(CDynBuf *p, ISzAlloc *alloc);
 
+typedef struct
+{
+	ISeekInStream s;
+	CDynBuf	buf;
+} CBufInStream;
+
+void BufInStream_CreateVTable(CBufInStream *p);
+
+
+
 #ifdef __cplusplus
 }
 #endif
