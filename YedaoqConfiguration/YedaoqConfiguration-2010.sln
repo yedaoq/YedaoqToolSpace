@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YedaoqConfiguration", "YedaoqConfiguration\YedaoqConfiguration.csproj", "{50F68096-7EA9-422A-A7CB-3E49D8A84C2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationModifier", "ConfigurationModifier\ConfigurationModifier.csproj", "{D1360B0E-59C4-49D3-B1F0-6D9F2D30E57C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{C59FE567-A5BF-4F74-A09E-20A643EE2F28}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{50F68096-7EA9-422A-A7CB-3E49D8A84C2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50F68096-7EA9-422A-A7CB-3E49D8A84C2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50F68096-7EA9-422A-A7CB-3E49D8A84C2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50F68096-7EA9-422A-A7CB-3E49D8A84C2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1360B0E-59C4-49D3-B1F0-6D9F2D30E57C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1360B0E-59C4-49D3-B1F0-6D9F2D30E57C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1360B0E-59C4-49D3-B1F0-6D9F2D30E57C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1360B0E-59C4-49D3-B1F0-6D9F2D30E57C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C59FE567-A5BF-4F74-A09E-20A643EE2F28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C59FE567-A5BF-4F74-A09E-20A643EE2F28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C59FE567-A5BF-4F74-A09E-20A643EE2F28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C59FE567-A5BF-4F74-A09E-20A643EE2F28}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

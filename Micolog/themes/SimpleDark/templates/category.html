@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %} {{category.name}} - {{blog.title|escape}} {% endblock %}
+{% block head_block %}
+<meta name="Keywords" content="{{category.name}}" />
+<meta name="Description" content="分类{{category.name}}下的文章" />
+{% endblock %}
+{% block content %}
+<div id="main">
+   <div id="content">{% include "category_ajax.html" %}</div>
+  {% include "sidebar.html" %} 
+</div>
+{% endblock %}

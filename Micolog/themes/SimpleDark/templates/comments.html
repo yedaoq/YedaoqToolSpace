@@ -1,0 +1,87 @@
+<!--comments start-->
+
+<div id="reaction">
+  <div id="comments" class="section">
+    <h3>评论 (<span class="comment-count">{{entry.commentcount}}</span>)</h3>
+    {% if comments %}
+    <ol id="comment-list">
+      {% for comment in comments %}
+      <li class="comment" id="comment-{{comment.key.id}}"> <img src="{{comment.gravatar_url}}" class="avatar round" height="36" width="36" />
+        <p class="comment-meta"><span class="datetime">{{comment.date|datetz:"H:i, m-d-Y"}}</span><span class="author"><a href="#comment-{{comment.key.id}}">#{{comment.no}}</a>&nbsp;&nbsp;{%if comment.weburl %}<a href='{{comment.weburl}}' target="_blank">{{comment.author}}</a>{% else %}{{comment.author}}{%endif%}</span><span class="actions">&nbsp;&nbsp;/&nbsp;&nbsp;{% if comment.reply_notify_mail %}<a onclick="return backcomment('{{comment.author}}','{{comment.key.id}}');" href="#respond"  style="color:#d8cb9e">回复</a>{% else %}<a onclick="return backcomment('{{comment.author}}','{{comment.key.id}}');" href="#respond">回复</a>{% endif %}&nbsp;&nbsp;<a onclick="return quote('{{comment.author}}','commenttext-{{comment.key.id}}')" href="#respond">引用</a></span></p>
+        <div class="comment-body" id="commenttext-{{comment.key.id}}"> {{comment.content}} </div>
+      </li>
+      {% endfor %}
+    </ol>
+    <div class="commentnavi"> {{comments_nav.nav}} </div>
+    {% else %}
+    <ol>
+    </ol>
+    {% endif %} </div>
+  {% if entry.allow_comment %}
+  <script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+  <script type="text/javascript" src="/static/js/jquery.form.utf8.js"></script>
+  <script type="text/javascript" src="/themes/{{ blog.theme_name }}/comment.js"></script>
+  <div id="respond">
+    <h3 id="reply-title">发表评论 </h3>
+    <form action="/post_comment" method="post" id="commentform">
+      <div id="comment-author-info">
+        <p class="comment-form-author">
+          <input type="text" name="author" id="author" tabindex="1" size="24" value=""/>
+          <label for="author">昵称 (*)</label>
+        </p>
+        <p class="comment-form-email">
+          <input id="email" name="email" tabindex="2" type="text" size="24" value=""/>
+          <label for="email">邮箱 (*)</label>
+        </p>
+        <p class="comment-form-url">
+          <input id="url" name="url" tabindex="3" type="text" size="24" value="" />
+          <label for="url">网站(可选)</label>
+        </p>
+        <div id="checkarea"> {%ifequal blog.comment_check_type 1%}
+          <input type="text" name="checkret" id="checkret" class="textfield" value="" size="24" tabindex="4" />
+          <label for="checkret" class="small">验证：</label>
+          <iframe src="/checkcode/" style="width:70px;height:30px;border:0;" allowTransparency="true" SCROLLING=no></iframe>
+          {%endifequal%}
+          {%ifequal blog.comment_check_type 2%}
+          <input type="text" name="checkret" id="checkret" class="textfield" value="" size="24" tabindex="4" />
+          <label for="checkret" class="small">验证(<a href="javascript:showCheckImage();">点击显示</a>)：</label>
+          <img id='checkimg' style='visibility:hidden' src='' title='点击图片切换' onclick="reloadCheckImage();"/>
+          <script>
+    function showCheckImage()
+    {
+        var img = document.getElementById('checkimg');
+        img.src = "/checkimg/";
+        img.style.visibility='visible';
+    }
+    function reloadCheckImage()
+    {
+        var img = document.getElementById('checkimg');
+        img.src += "?";
+    }
+ </script>
+          {%endifequal%}
+          {%ifequal blog.comment_check_type 3%}
+          <input type="hidden" name="checknum" id="checknum" value="{{checknum1}}+{{checknum2}}" />
+          <input type="text" name="checkret" id="checkret"  class="textfield" value="" size="24" tabindex="4" />
+          <label for="checkret" class="small">验证：<span id="disp_check">{{checknum1}}+{{checknum2}}=？</span></label>
+          {%endifequal%} </div>
+      </div>
+      <p>评论内容：</p>
+      <p id="comment-wrapper">
+        <textarea id="comment" name="comment" rows="5" cols="60" tabindex="5" onkeydown="if(event.ctrlKey&&event.keyCode==13){document.getElementById('submit').click();return false};"></textarea>
+      </p>
+      <p class="form-submit">
+      <div id="s_msg" style="display:none;color:#faf168">正在提交评论...</div>
+      <input type="hidden" name="key" value="{{entry.key}}" />
+      <input type="hidden" name="useajax" value="1" />
+      <input name="submit" type="submit" id="submit" value="发表评论 (Ctrl+Enter)" />
+      <input name="reply_notify_mail" id="reply_notify_mail" tabindex="7" style="width: auto;" type="checkbox" />
+      <label for="reply_notify_mail">新回复邮件通知</label>
+      <span style="margin-left:15px;"><i>小提示: 您能通过 <a href="http://gravatar.com" target="_blank">Gravatar</a> 定制通用头像</i></span>
+      </p>
+    </form>
+  </div>
+  {% else %}
+  <p class="nocomments">评论已关闭</p>
+  {% endif %} </div>
+<!--comments end-->

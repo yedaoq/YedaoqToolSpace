@@ -1,0 +1,74 @@
+<div id="sidebar">
+  <div id="text" class="widthfill widget">
+    <div class="textwidget">
+      <p>{{blog.blognotice}}</p>
+    </div>
+  </div>
+  <div id="tag_cloud" class="widget_tag_cloud widget widthfill">
+    <h4>Tags</h4>
+    <div class="tagcloud"> {% if alltags %}
+      {% for t in alltags %} <a style="font-size:{{ t.tagcount|add:9 }}px;" title="{{ t.tagcount }}篇文章" 
+						href="/tag/{{t.tag|urlencode}}">{{t.tag}}</a> {%endfor%}
+      {% endif %} </div>
+  </div>
+  <div id="categories" class="widget left widthhalf">
+    <h4>Categories</h4>
+    <ul>
+      {%for cate in categories%}
+      {% if not cate.parent_cat %}
+      <li class="cat-item"><a href="/category/{{cate.slug}}" title="查看 {{cate.name}} 下的全部文章">{{cate.name}}</a>({{cate.count}})</li>
+      {% if cate.children%} 
+      {%for cate in cate.children%}
+      <ul class='children'>
+        <li class="cat-item"><a href="/category/{{cate.slug}}" title="查看 {{cate.name}} 下的全部文章">{{cate.name}}</a>({{cate.count}})</li>
+      </ul>
+      {%endfor%} 
+      {%endif%} 
+      {%endif%}    
+      {%endfor%}
+    </ul>
+  </div>
+  <div id="archives" class="widget right widthhalf">
+    <h4>Archives</h4>
+    <ul>
+      {%for archive in archives%}
+      <li><a href="/{{archive.year}}/{{archive.month}}" title="{{archive.year}}年{{archive.month}}月的文章">{{archive.year}}年{{archive.month}}月</a>({{archive.entrycount}})</li>
+      {%endfor%}
+    </ul>
+  </div>
+  <div id="recent-comments" class="widget widthfill">
+    <h4>Recent Comments</h4>
+    <ul id="recentcomments">
+      {% for comment in recent_comments %}
+      <li class="rc_item">
+        <div class="rc_avatar"><img src='{{comment.gravatar_url}}' class='avatar avatar-28 photo round' height='28' width='28' /></div>
+        <div class="rc_info"><span class="author_name">{%if comment.weburl %}<a href="{{comment.weburl}}" target="_blank">{{comment.author}}</a>{% else %}{{comment.author}}{%endif%}</span> | {{comment.date|datetz:"H:i, m-d"}}</div>
+        <div class="rc_excerpt"><a href="/{{comment.entry.link|escape}}#comment-{{comment.key.id}}" title="发表于 {{comment.entry.title|escape}}">{{comment.shortcontent}}...</a></div>
+      </li>
+      {%endfor%}
+    </ul>
+  </div>
+  <div id="linkcat" class="widget widthfill">
+    <h4>Blog roll</h4>
+    <ul class='xoxo blogroll'>
+      {%for link in blogroll%}
+      <li><a href="{{link.href}}" title="{{link.linktext}}" target="_blank">{{link.linktext}}</a></li>
+      {%endfor%}
+    </ul>
+  </div>
+</div>
+<script type="text/javascript">
+    $(".tagcloud a").each(function (i) {
+        this.style.color = randomColor()
+    });
+    function randomColor() {
+        var arrHex = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
+        var strHex = "#";
+        var index;
+        for (var i = 0; i < 6; i++) {
+            index = Math.round(Math.random() * 15);
+            strHex += arrHex[index];
+        }
+        return strHex;
+    }
+</script>

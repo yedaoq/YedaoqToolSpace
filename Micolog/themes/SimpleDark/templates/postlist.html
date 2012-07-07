@@ -1,0 +1,13 @@
+﻿{% for entry in entries %}
+<div id="post-{{entry.key}}" class="post">
+    <!--div class="left" style="width:500px"-->
+        <h2><a class="post-title" href="/{{ entry.link|escape }}" title="{{ entry.title|escape }}">{{ entry.title|escape }}</a></h2>
+        <div class="post-meta">
+            Tag : {%for cate in entry.categories%}<a href="/category/{{cate.slug}}" title="查看 {{cate.name}} 目录下的所有文章">{{cate.name}}</a>&nbsp;{%endfor%}&nbsp; {% if entry.tags%}{%for tag in entry.tags%}<a href="/tag/{{tag|urlencode}}" title="查看 {{tag}} 标签下的所有文章">{{tag}}</a>&nbsp;{%endfor%}{%endif%}
+            {%if entry.commentcount%}Comment : <a href="/{{entry.link|escape}}#comments">{{entry.commentcount}} 度</a>&nbsp;{% endif %}
+            {%if self.is_admin%}&nbsp;<a href="{{entry.edit_url}}" target="_blank">edit</a>&nbsp;{%endif%} 
+        </div>
+        <div class="entry"> {{entry|excerpt_more:"<strong>&raquo;阅读全文</strong>"}} </div>
+    <!--/div-->
+</div>
+{% endfor %}

@@ -1,0 +1,23 @@
+﻿<div id="post-{{entry.key}}" class="post">
+    {% include "post-header.html" %}
+	<div class="entry"> {{ entry.content }} </div>
+	<div class="post-meta sep">
+        Tag : {%for cate in entry.categories%}<a href="/category/{{cate.slug}}" title="查看 {{cate.name}} 目录下的所有文章">{{cate.name}}</a>&nbsp;{%endfor%}&nbsp; {% if entry.tags%}{%for tag in entry.tags%}<a href="/tag/{{tag|urlencode}}" title="查看 {{tag}} 标签下的所有文章">{{tag}}</a>&nbsp;{%endfor%}{%endif%}
+        {%if entry.commentcount%}Comment : <a href="/{{entry.link|escape}}#comments">{{entry.commentcount}} 度</a>&nbsp;{% endif %}
+        {%if self.is_admin%}&nbsp;<a href="{{entry.edit_url}}" title="编辑" target="_blank">edit</a>&nbsp;{%endif%} 
+    </div>
+</div>
+<div class="pagenavi"> {%for prev in entry.prev%} <span class="previous-page">&laquo;&nbsp;<a href="/{{prev.link}}">{{prev.title}}</a></span> {%endfor%}
+	{%for next in entry.next%} <span class="next-page"><a href="/{{next.link}}">{{next.title}}</a>&nbsp;&raquo;</span> {%endfor%} 
+</div>
+<div class="wumii-hook">
+	<input type="hidden" name="wurl" value="{{blog.baseurl}}/{{ entry.link }}" />
+	<input type="hidden" name="wtitle" value="{{entry.title}}" />
+</div>
+<p style="display: none;">
+	{%for tag in entry.tags%}<a rel="tag">{{tag}}</a>{%endfor%}
+</p>
+<script>
+	var wumiiSitePrefix = "{{blog.baseurl}}";
+</script>
+{% include "comments.html" %} 

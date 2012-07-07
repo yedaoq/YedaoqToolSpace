@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %} {{entry.title|escape}} - {{blog.title|escape}} {% endblock %}
+{% block head_block %}
+{% if entry %}
+{%if entry.strtags%}
+<meta name="Keywords" content="{{entry.strtags|escape}}">
+{%endif%}
+{%if entry.excerpt%}
+<meta name="Description" content="{{entry.excerpt|escape}}">
+{%endif%}
+{% endif %}
+{% endblock %}
+{% block content %}
+<div id="main">
+	 <div id="content">{% include "single_ajax.html" %}</div>
+	{% include "sidebar.html" %} 
+</div>
+{% endblock %}

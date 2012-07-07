@@ -1,0 +1,3 @@
+<div class="content-header"> &laquo; <strong>{{year}}年{{month}}月</strong> 的文章归档 </div>
+{% include "postlist.html" %}
+<div class="pagenavi"> <span class="previous-page"> {% if pager.prev %}&laquo;&nbsp;<a href="?page={{ pager.prev}}">上一页</a>{% endif %} </span> <span class="next-page"> {% if pager.next %}<a href="?page={{ pager.next }}">下一页</a>&nbsp;&raquo;{% endif %} </span> </div>

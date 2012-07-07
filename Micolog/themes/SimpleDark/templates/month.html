@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %} {{year}}年{{month}}月-{{blog.title|escape}} {% endblock %}
+{% block head_block %}
+<meta name="Keywords" content=" {{year}}年{{month}}月,{{blog.title|escape}}" />
+<meta name="Description" content=" {{year}}年{{month}}月的文章归档" />
+{% endblock %}
+{% block content %}
+<div id="main">
+   <div id="content">{% include "month_ajax.html" %}</div>
+  {% include "sidebar.html" %} 
+</div>
+{% endblock %}

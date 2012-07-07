@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchPost", "BatchPost\BatchPost.csproj", "{93A50A8C-18F1-4183-906A-A1092E8DD85D}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "BatchPostInstaller", "BatchPostInstaller\BatchPostInstaller.vdproj", "{298F91EC-2D0A-44F3-B806-3BD7D04897BE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{93A50A8C-18F1-4183-906A-A1092E8DD85D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93A50A8C-18F1-4183-906A-A1092E8DD85D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93A50A8C-18F1-4183-906A-A1092E8DD85D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93A50A8C-18F1-4183-906A-A1092E8DD85D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{298F91EC-2D0A-44F3-B806-3BD7D04897BE}.Debug|Any CPU.ActiveCfg = Debug
+		{298F91EC-2D0A-44F3-B806-3BD7D04897BE}.Debug|Any CPU.Build.0 = Debug
+		{298F91EC-2D0A-44F3-B806-3BD7D04897BE}.Release|Any CPU.ActiveCfg = Release
+		{298F91EC-2D0A-44F3-B806-3BD7D04897BE}.Release|Any CPU.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

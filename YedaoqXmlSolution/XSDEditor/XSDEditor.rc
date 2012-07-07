@@ -1,0 +1,317 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(中华人民共和国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#include ""res\\XSDEditor.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
+    "#include ""l.CHS\\afxres.rc""      // 标准组件\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\XSDEditor.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "关于 XSDEditor"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
+    LTEXT           "XSDEditor，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2012",IDC_STATIC,42,26,114,8
+    DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
+END
+
+IDD_XSDEDITOR_DIALOG DIALOGEX 0, 0, 397, 236
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "XSDEditor"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+END
+
+IDD_DLG_SIMPLETYPE1 DIALOGEX 0, 0, 480, 221
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_POPUP | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "",IDC_STATIC,37,76,287,33
+    CONTROL         "包含",IDC_RDOINCLUDE,"Button",BS_AUTORADIOBUTTON,45,91,27,10
+    CONTROL         "排除",IDC_RDOEXCLUDE,"Button",BS_AUTORADIOBUTTON,76,91,28,10
+    LTEXT           "范围",IDC_STATIC,17,93,8,20
+    EDITTEXT        IDC_TXTRANGEUPPER,150,89,59,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TXTRANGELOWER,255,89,62,14,ES_AUTOHSCROLL
+    CONTROL         "上限",IDC_CHKRANGEUPPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,118,91,29,10
+    CONTROL         "下限",IDC_CHKRANGELOWER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,91,29,10
+    CONTROL         "",IDC_TXTDESC,"RichEdit20W",WS_TABSTOP | 0x84,11,6,454,38
+    LTEXT           "枚举",IDC_STATIC,17,129,8,20
+    GROUPBOX        "",IDC_STATIC,37,113,287,33
+    CONTROL         "<a>SysLink1</a>",IDC_LNKENUM,"SysLink",WS_TABSTOP,45,128,273,14
+    LTEXT           "正则",IDC_STATIC,17,165,8,20
+    GROUPBOX        "",IDC_STATIC,37,150,287,33
+    EDITTEXT        IDC_TXTPATTERN,43,163,276,14,ES_AUTOHSCROLL
+    LTEXT           "基类：",IDC_STATIC,12,57,25,8
+    COMBOBOX        IDC_COMBO1,37,56,286,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "",IDC_STATIC,333,76,133,108
+    LTEXT           "长度：",IDC_STATIC,341,87,25,8
+    EDITTEXT        IDC_EDIT2,368,85,93,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    LTEXT           "精度：",IDC_STATIC,342,103,25,8
+    EDITTEXT        IDC_EDIT3,368,102,93,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    LTEXT           "空白：",IDC_STATIC,341,121,25,8
+    COMBOBOX        IDC_CMBWHITE,368,120,93,13,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "",IDC_STATIC,7,76,27,107,NOT WS_VISIBLE
+    CONTROL         "",IDC_RDORANGE,"Button",BS_AUTORADIOBUTTON,16,82,9,10
+    CONTROL         "",IDC_RDOENUM,"Button",BS_AUTORADIOBUTTON,16,118,9,10
+    CONTROL         "",IDC_RDOPATTERN,"Button",BS_AUTORADIOBUTTON,16,154,9,10
+END
+
+IDD_DLG_SIMPLETYPE DIALOGEX 0, 0, 280, 245
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_POPUP | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_TXTDESC,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | WS_TABSTOP,31,6,244,38
+    CONTROL         "",IDC_RDOUNION,"Button",BS_AUTORADIOBUTTON | WS_GROUP,6,56,9,10
+    CONTROL         "",IDC_RDOLIST,"Button",BS_AUTORADIOBUTTON,19,56,9,10
+    CONTROL         "",IDC_RDORESTRICT,"Button",BS_AUTORADIOBUTTON,6,94,9,10
+    CONTROL         "数值：",IDC_RDONUM,"Button",BS_AUTORADIOBUTTON | WS_GROUP,41,118,40,10
+    CONTROL         "长度：",IDC_RDOLEN,"Button",BS_AUTORADIOBUTTON,41,167,40,10
+    CONTROL         "枚举 -",IDC_RDOENUM,"Button",BS_AUTORADIOBUTTON,41,198,37,10
+    CONTROL         "正则：",IDC_RDOPATTERN,"Button",BS_AUTORADIOBUTTON,78,198,40,10
+    CONTROL         "<a>SysLink1</a>",IDC_LNKTYPES,"SysLink",WS_TABSTOP,44,67,227,14
+    CONTROL         "<a>SysLink2</a>",IDC_LNKBASE,"SysLink",WS_TABSTOP,63,102,116,14
+    COMBOBOX        IDC_CMBWHITE,214,101,56,13,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_TXTRANGEU,68,128,59,14,ES_AUTOHSCROLL,WS_EX_RIGHT
+    EDITTEXT        IDC_TXTRANGEL,140,128,59,14,ES_AUTOHSCROLL,WS_EX_RIGHT
+    CONTROL         "上开",IDC_CHKOPENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,206,130,27,10
+    CONTROL         "下开",IDC_CHKOPENL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,130,27,10
+    EDITTEXT        IDC_TXTDIGIT,68,147,59,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    EDITTEXT        IDC_TXTFRACTION,140,147,59,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    EDITTEXT        IDC_TXTLENU,68,178,59,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    EDITTEXT        IDC_TXTLENL,140,178,59,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    CONTROL         "固定",IDC_RDOLENFIX,"Button",BS_AUTORADIOBUTTON | WS_GROUP,206,179,27,10
+    CONTROL         "范围",IDC_RDOLENRANGE,"Button",BS_AUTORADIOBUTTON,238,179,28,10
+    CONTROL         "<a>SysLink1</a>",IDC_LNKENUM,"SysLink",WS_TABSTOP,44,213,222,14
+    GROUPBOX        "",IDC_STATIC,36,168,234,27
+    GROUPBOX        "",IDC_STATIC,31,91,243,149
+    GROUPBOX        "",IDC_STATIC,32,52,243,33
+    LTEXT           "位数：",IDC_STATIC,42,148,25,8
+    GROUPBOX        "",IDC_STATIC,36,118,234,47
+    GROUPBOX        "",IDC_STATIC,36,198,234,33
+    LTEXT           "基类：",IDC_STATIC,38,103,25,8
+    LTEXT           "长度：",IDC_STATIC,42,180,25,8
+    LTEXT           "空白：",IDC_STATIC,188,103,25,8
+    LTEXT           "描述：",IDC_STATIC,5,7,24,8
+    LTEXT           "联合",IDC_STATIC,7,67,8,20
+    LTEXT           "列表",IDC_STATIC,20,67,8,20
+    LTEXT           "限定",IDC_STATIC,7,105,8,20
+    LTEXT           "范围：",IDC_STATIC,42,130,24,8
+    LTEXT           ">",IDC_STATIC,132,149,8,8
+    LTEXT           ">",IDC_STATIC,132,130,8,8
+    LTEXT           ">",IDC_STATIC,132,179,8,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080403a8"
+        BEGIN
+            VALUE "CompanyName", "TODO: <公司名>"
+            VALUE "FileDescription", "TODO: <文件说明>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "XSDEditor.exe"
+            VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
+            VALUE "OriginalFilename", "XSDEditor.exe"
+            VALUE "ProductName", "TODO: <产品名>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 936
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_XSDEDITOR_DIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 396
+        BOTTOMMARGIN, 235
+    END
+
+    IDD_DLG_SIMPLETYPE1, DIALOG
+    BEGIN
+        RIGHTMARGIN, 479
+        BOTTOMMARGIN, 220
+    END
+
+    IDD_DLG_SIMPLETYPE, DIALOG
+    BEGIN
+        RIGHTMARGIN, 279
+        BOTTOMMARGIN, 244
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_DLG_SIMPLETYPE1 DLGINIT
+BEGIN
+    IDC_CMBWHITE, 0x403, 9, 0
+0x7270, 0x7365, 0x7265, 0x6576, "\000" 
+    IDC_CMBWHITE, 0x403, 8, 0
+0x6572, 0x6c70, 0x6361, 0x0065, 
+    IDC_CMBWHITE, 0x403, 9, 0
+0x6f63, 0x6c6c, 0x7061, 0x6573, "\000" 
+    0
+END
+
+IDD_DLG_SIMPLETYPE DLGINIT
+BEGIN
+    IDC_CMBWHITE, 0x403, 9, 0
+0x7270, 0x7365, 0x7265, 0x6576, "\000" 
+    IDC_CMBWHITE, 0x403, 8, 0
+0x6572, 0x6c70, 0x6361, 0x0065, 
+    IDC_CMBWHITE, 0x403, 9, 0
+0x6f63, 0x6c6c, 0x7061, 0x6573, "\000" 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "关于 XSDEditor(&A)..."
+END
+
+#endif    // 中文(中华人民共和国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE 4, 2
+#pragma code_page(936)
+#include "res\XSDEditor.rc2"  // 非 Microsoft Visual C++ 编辑的资源
+#include "l.CHS\afxres.rc"      // 标准组件
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

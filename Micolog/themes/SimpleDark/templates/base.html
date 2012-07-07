@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>{%mf head%}
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+{%mf metaAdd%}{%endmf%}
+<title>{% block title %} {{ blog.title|escape}}{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="/themes/{{ blog.theme_name }}/style.css" media="screen" />
+<!--[if IE]><link rel="stylesheet" type="text/css" href="/themes/{{ blog.theme_name }}/ie.css" media="screen" /><![endif]-->
+<link rel="alternate" type="application/rss+xml" title="{{ blog.title }} RSS Feed" href="{{ blog.feedurl }}" />
+<link href="/static/wlwmanifest.xml" type="application/wlwmanifest+xml" rel="wlwmanifest"/>
+<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js?ver=1.4.2'></script>
+{% block head_block %}{% endblock %}
+{%endmf%}
+</head>
+<body>
+<div id="page">
+  <div id="header">
+    <h1 id="blog-name"><a href="{{blog.baseurl}}/" title="{{blog.title}}">{{blog.title|escape}}</a></h1>
+    <div id="blog-description">{{ blog.subtitle|escape}}</div>
+    <div class="top-menu">
+      <div class="top-menu-window">
+        <ul>
+          {%if self.is_admin or self.author%}
+             <li><a href="/admin">Admin</a> </li>
+          {%endif%}
+             <li> {%if self.is_login%} <a href="{{self.logouturl}}">Logout</a> {%else%} <a href="/admin">Login</a> {%endif%} </li>
+          {%mf nav_menu%}
+          {%endmf%}
+          {% block topmenu %}{% endblock %}
+          {{self.m_list_pages}}          
+		  <li><a href="{{ blog.feedurl }}">RSS</a></li>        
+        </ul>
+      </div>
+    </div>
+  </div>
+  {%block content %}{%endblock%}
+  <div id="footer">{%mf footer%}
+    <p>&copy; 2010 <a href="{{blog.baseurl}}">{{ blog.title|escape}}</a> | yedaoq@126.com </p>
+    {%endmf%}</div>
+</div>
+<!-- page end -->
+<div id="fixed-nav">
+  <div class="buttons"> <a class="top" href="#header"></a><a class="bottom" href="#footer"></a> </div>
+</div>
+<script type='text/javascript' src='/themes/{{ blog.theme_name }}/simpledark-base.min.js'></script>
+{% if entry %}
+<script type="text/javascript" id="wumiiRelatedItems" src="http://widget.wumii.com/ext/relatedItemsWidget.htm?type=1&amp;mode=3&amp;num=5&amp;pf=Micolog"></script>
+<a href="http://www.wumii.com/widget/relatedItems.htm" style="border:0;">
+    <img src="http://static.wumii.com/images/pixel.png" alt="无觅相关文章插件" style="border:0;padding:0;margin:0;" />
+</a>
+{%endif%}
+</body>
+</html>

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %} {{tag}} - {{blog.title|escape}} {% endblock %}
+{% block head_block %}
+<meta name="Keywords" content="{{tag}}" />
+<meta name="Description" content="包含标签{{tag}}的文章" />
+{% endblock %}
+{% block content %}
+<div id="main">
+   <div id="content">{% include "tag_ajax.html" %}</div>
+  {% include "sidebar.html" %} 
+</div>
+{% endblock %}

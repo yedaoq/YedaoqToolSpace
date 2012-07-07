@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConfigDesigner", "ConfigDesigner\ConfigDesigner.vcproj", "{7507C363-6848-4E3B-884E-D25DFC9BCC41}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppConfigSchema", "CppConfigSchema\CppConfigSchema.vcproj", "{510742DC-9FA7-41EC-892C-7FA5F8D2E526}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppConfigGenerator", "CppConfigGenerator\CppConfigGenerator.vcproj", "{F390D21A-29BA-4DAA-8853-80088AAC2172}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7507C363-6848-4E3B-884E-D25DFC9BCC41}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7507C363-6848-4E3B-884E-D25DFC9BCC41}.Debug|Win32.Build.0 = Debug|Win32
+		{7507C363-6848-4E3B-884E-D25DFC9BCC41}.Release|Win32.ActiveCfg = Release|Win32
+		{7507C363-6848-4E3B-884E-D25DFC9BCC41}.Release|Win32.Build.0 = Release|Win32
+		{510742DC-9FA7-41EC-892C-7FA5F8D2E526}.Debug|Win32.ActiveCfg = Debug|Win32
+		{510742DC-9FA7-41EC-892C-7FA5F8D2E526}.Debug|Win32.Build.0 = Debug|Win32
+		{510742DC-9FA7-41EC-892C-7FA5F8D2E526}.Release|Win32.ActiveCfg = Release|Win32
+		{510742DC-9FA7-41EC-892C-7FA5F8D2E526}.Release|Win32.Build.0 = Release|Win32
+		{F390D21A-29BA-4DAA-8853-80088AAC2172}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F390D21A-29BA-4DAA-8853-80088AAC2172}.Debug|Win32.Build.0 = Debug|Win32
+		{F390D21A-29BA-4DAA-8853-80088AAC2172}.Release|Win32.ActiveCfg = Release|Win32
+		{F390D21A-29BA-4DAA-8853-80088AAC2172}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

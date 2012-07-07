@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block head_block %}
+<meta name="Description" content="{{ blog.subtitle|escape}}" />
+{% endblock %}
+{% block content %}
+<div id="main">
+  <div id="content">
+    {% include "postlist.html" %}
+    <div class="pagenavi"> <span class="previous-page">{% if show_prev %}<a href="/page/{{ pageindex|add:"-1" }}">&laquo;上一页</a>{% endif %} </span><span class="next-page"> {% if show_next %}<a href="/page/{{ pageindex|add:"1" }}">下一页&raquo;</a>{% endif %}</span> </div>
+  </div>
+  {% include "sidebar.html" %} </div>
+{% endblock %} 

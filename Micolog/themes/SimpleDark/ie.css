@@ -1,0 +1,89 @@
+/* CSS Hacks for Internet Explorer (IE8 and below) */
+img {
+	-ms-interpolation-mode:bicubic;
+}
+
+.top-menu .scroller {
+	_background:url(images/scroller.gif) no-repeat 0 top;
+}
+
+.top-menu li a {
+	_zoom:1;
+}
+
+#main {
+	_height:500px; /* min-height for IE6 */
+	_overflow:visible;
+}
+
+.content-header {
+	_background:url(images/hsep2.png) repeat-x 0 bottom;
+}
+
+#content div.post, #content div.page {
+	_background:url(images/hsep2.png) repeat-x 0 bottom;
+}
+
+.entry {
+	_zoom:1;
+}
+
+.post-pages {
+	_zoom:1;
+}
+
+.comment {
+	_zoom:1;
+}
+
+.pagenavi {
+	_background:url(images/hsep2.png) repeat-x 0 bottom;
+	_zoom:1;
+}
+
+.commentnavi {
+	_zoom:1;
+}
+
+.pagenavi .paginator span strong {
+	*position:relative;
+	*top:-1px;
+}
+
+.commentnavi .page-numbers {
+	*position:relative;
+	*top:-1px;
+}
+
+#sidebar .widget {
+	_background:url(images/hsep2.png) repeat-x 0 bottom;
+}
+
+#s {
+	_width:90%;
+	background-color:#0c0c0c;
+	border:1px solid #181818;
+}
+
+#s:focus {
+	background-color:#121212;
+	border:1px solid #2c2c2c;
+}
+
+#s-msg {
+	padding:6px\0;
+	*padding:7px;
+}
+
+#search-submit {
+	*top:6px; *right:4px; _right:31px;
+}
+
+.widget#recentcomments li {
+	_zoom:1;
+}
+
+#fixed-nav {
+	_position:absolute;
+	_top:expression(eval(document.documentElement.scrollTop + document.documentElement.clientHeight * 0.6));
+}

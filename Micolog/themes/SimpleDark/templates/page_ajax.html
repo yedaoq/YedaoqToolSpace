@@ -1,0 +1,8 @@
+<div id="post-{{entry.key}}" class="post">
+	<h2 class="post-title"><a href="/{{ entry.link|escape }}" title="{{ entry.title|escape }}">{{ entry.title|escape }}</a></h2>
+	<div class="post-meta">{{ entry.date|datetz:"F jS, Y, H:i" }} {{entry.author}} / <a href="/{{entry.link|escape}}">{{entry.readtimes}} 次阅读</a> / <a href="/{{entry.link|escape}}#comments" title="查看 {{ entry.title}} 下的全部评论">{{entry.commentcount}} 条评论</a>{%if self.is_admin%} / <a class="post-edit-link" href="{{entry.edit_url}}"  title="编辑文章" target="_blank">编辑</a>{%endif%} </div>
+	<div class="entry"> {{entry.content}}</div>
+	<div class="post-info">标签：{% if entry.tags%}{%for tag in entry.tags%}&nbsp;<a href="/tag/{{tag|urlencode}}" title="查看 {{tag}} 标签的全部文章">{{tag}}</a>&nbsp;{%endfor%}{%endif%} </div>
+</div>
+{% include "comments.html" %} 
+

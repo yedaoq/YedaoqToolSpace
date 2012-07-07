@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Font Name="SimSun" Size="9" />
+  <Class Name="YedaoqConfiguration.AppConfiguration" Collapsed="true">
+    <Position X="2.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>AppConfiguration.cs</FileName>
+      <HashCode>AABAABBAACQAAAQACAAEAEBAAAAAAABAAAQAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="YedaoqConfiguration.ClientInfo" Collapsed="true">
+    <Position X="4.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>ClientInfo.cs</FileName>
+      <HashCode>AAAAAAAAgCAAwBAEAAAAIAQAAAAAAAAAAAAAAAAEAAA=</HashCode>
+    </TypeIdentifier>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="YedaoqConfiguration.ConfigurationUnitBase" Collapsed="true">
+    <Position X="8.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>ConfigurationUnitBase.cs</FileName>
+      <HashCode>AAAAAAAAAAAAABAAAAAgAABAAhAABiQBgAAgAABIAAA=</HashCode>
+    </TypeIdentifier>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="YedaoqConfiguration.ConfigurationSectionGroupInfo&lt;T&gt;" Collapsed="true">
+    <Position X="7.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>ConfigurationSectionGroupInfo.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="YedaoqConfiguration.ConfigurationSectionInfo&lt;T&gt;" Collapsed="true">
+    <Position X="9.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>ConfigurationSectionInfo.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="YedaoqConfiguration.ConfigurationObjectManager" Collapsed="true">
+    <Position X="0.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>ConfigurationObjectManager.cs</FileName>
+      <HashCode>AAAAAIAAACAAAAAAAECIAAAAEAAAAAAAgAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="YedaoqConfiguration.ConfigurationHelper" Collapsed="true">
+    <Position X="10.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>ConfigurationHelper.cs</FileName>
+      <HashCode>AAAABAAAAAAAAAABAAAcAAUAAAAAAAAAAAAAAAAIAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="YedaoqConfiguration.AppConfigurationProviderAttribute" Collapsed="true">
+    <Position X="2.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>AppConfigurationProviderAttribute.cs</FileName>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAIAQAAAAAAAAAAAAAAAAEAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="YedaoqConfiguration.ConfigurationUnitTypeDescripter" Collapsed="true">
+    <Position X="0.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>ConfigurationUnitTypeDescripter.cs</FileName>
+      <HashCode>AAAAiAAACAAAAAAgAAAAQAAAABAEIAEAQERAAAAACAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="YedaoqConfiguration.IAppConfigurationProvider" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>IAppConfigurationProvider.cs</FileName>
+      <HashCode>AACAAAAAAAAAAQAAACAAAAAAAAAAAAAQAAAAAAAAAAQ=</HashCode>
+    </TypeIdentifier>
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+  </Interface>
+  <Interface Name="YedaoqConfiguration.IClientInfo" Collapsed="true">
+    <Position X="4.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>IClientInfo.cs</FileName>
+      <HashCode>AAAAAAAAgAAAgBAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="YedaoqConfiguration.IConfigurationUnitInfo" Collapsed="true">
+    <Position X="8.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>IConfigurationUnitInfo.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgAABiAAAAAgAABIAAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="YedaoqConfiguration.IAppConfiguration" Collapsed="true">
+    <Position X="2.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>IAppConfiguration.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAQAAAAEAAAAAAAAAABAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+  </Interface>
+  <Interface Name="YedaoqConfiguration.IConfigurationObjectManager" Collapsed="true">
+    <Position X="0.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>IConfigurationObjectManager.cs</FileName>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+  </Interface>
+  <Enum Name="YedaoqConfiguration.EnumConfigDomain" Collapsed="true">
+    <Position X="6.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>EnumConfigDomain.cs</FileName>
+      <HashCode>AAABAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Enum>
+</ClassDiagram>
