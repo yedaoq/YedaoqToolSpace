@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Png2Bmp", "Png2Bmp\Png2Bmp.vcproj", "{B698CCE7-A3E7-4339-B056-0BE463402C0D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Png2BmpW", "Png2BmpW\Png2BmpW.vcproj", "{F9F32243-F7FD-429E-BCBE-497E6C1CD20A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AlphaTest", "AlphaTest\AlphaTest.vcproj", "{0A8339D8-C4A0-4537-AAE7-CDDF3880F394}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B698CCE7-A3E7-4339-B056-0BE463402C0D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B698CCE7-A3E7-4339-B056-0BE463402C0D}.Debug|Win32.Build.0 = Debug|Win32
+		{B698CCE7-A3E7-4339-B056-0BE463402C0D}.Release|Win32.ActiveCfg = Release|Win32
+		{B698CCE7-A3E7-4339-B056-0BE463402C0D}.Release|Win32.Build.0 = Release|Win32
+		{F9F32243-F7FD-429E-BCBE-497E6C1CD20A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F9F32243-F7FD-429E-BCBE-497E6C1CD20A}.Debug|Win32.Build.0 = Debug|Win32
+		{F9F32243-F7FD-429E-BCBE-497E6C1CD20A}.Release|Win32.ActiveCfg = Release|Win32
+		{F9F32243-F7FD-429E-BCBE-497E6C1CD20A}.Release|Win32.Build.0 = Release|Win32
+		{0A8339D8-C4A0-4537-AAE7-CDDF3880F394}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0A8339D8-C4A0-4537-AAE7-CDDF3880F394}.Debug|Win32.Build.0 = Debug|Win32
+		{0A8339D8-C4A0-4537-AAE7-CDDF3880F394}.Release|Win32.ActiveCfg = Release|Win32
+		{0A8339D8-C4A0-4537-AAE7-CDDF3880F394}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
