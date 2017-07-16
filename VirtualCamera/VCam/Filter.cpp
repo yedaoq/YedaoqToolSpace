@@ -55,8 +55,8 @@ CVCamPin::CVCamPin(HRESULT *phr, CSource *pFilter)
     //m_rScreen.bottom = GetDeviceCaps(hDC, VERTRES);
 	m_rScreen.left = 0;
 	m_rScreen.top = 0;
-    m_rScreen.right  = m_rScreen.left + 320;
-    m_rScreen.bottom = m_rScreen.top + 240;
+    m_rScreen.right  = m_rScreen.left + 1280; //320;
+    m_rScreen.bottom = m_rScreen.top + 720; //240;
 
     // Save dimensions for later use in FillBuffer()
     m_iImageWidth  = m_rScreen.right  - m_rScreen.left;
@@ -296,7 +296,6 @@ HRESULT CVCamPin::DecideBufferSize(IMemAllocator *pAlloc,
 //
 HRESULT CVCamPin::SetMediaType(const CMediaType *pMediaType)
 {
-
     CAutoLock cAutoLock(m_pFilter->pStateLock());
 
     // Pass the call up to my base class

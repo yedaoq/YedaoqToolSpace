@@ -30,8 +30,6 @@ HBITMAP CopyScreenToBitmap(LPRECT lpRect, BYTE *pData, BITMAPINFO *pHeader, HCUR
     // a memory DC compatible to screen DC   
     hScrDC = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
 
-
-
     hMemDC = CreateCompatibleDC(hScrDC);
 
     // get points of rectangle to grab

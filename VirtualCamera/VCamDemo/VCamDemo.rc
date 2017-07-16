@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -27,18 +27,18 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"
@@ -66,15 +66,15 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\VCamDemo.ico"
+IDR_MAINFRAME           ICON                    "res\\VCamDemo.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 235, 55
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_ABOUTBOX DIALOG  0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "关于 VCamDemo"
 FONT 9, "宋体"
 BEGIN
@@ -84,27 +84,25 @@ BEGIN
     DEFPUSHBUTTON   "确定",IDOK,178,7,50,14,WS_GROUP
 END
 
-IDD_VCAMDEMO_DIALOG DIALOGEX 0, 0, 264, 227
-STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+IDD_VCAMDEMO_DIALOG DIALOGEX 0, 0, 388, 309
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "VCamDemo"
-FONT 9, "宋体"
+FONT 9, "宋体", 0, 0, 0x1
 BEGIN
-    LTEXT           "选择摄像头",IDC_STATIC,18,14,46,8
-    COMBOBOX        IDC_COMBO_CAMERA_LIST,70,13,177,58,CBS_DROPDOWN | 
-                    WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Width",IDC_STATIC,18,39,21,8
-    EDITTEXT        IDC_EDIT_WIDTH,41,36,28,14,ES_AUTOHSCROLL
-    LTEXT           "Height",IDC_STATIC,73,39,25,8
-    EDITTEXT        IDC_EDIT_HEIGHT,99,36,28,14,ES_AUTOHSCROLL
-    LTEXT           "FPS",IDC_STATIC,132,39,13,8
-    EDITTEXT        IDC_EDIT_FPS,151,36,29,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_VIDEO_WINDOW,"Static",SS_BLACKFRAME,21,59,225,152
-    PUSHBUTTON      "开始捕捉",IDC_BTN_START,196,35,50,14
+    LTEXT           "选择摄像头",IDC_STATIC,7,9,46,8
+    COMBOBOX        IDC_COMBO_CAMERA_LIST,56,7,325,58,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Width",IDC_STATIC,9,34,21,8
+    EDITTEXT        IDC_EDIT_WIDTH,32,31,28,14,ES_AUTOHSCROLL
+    LTEXT           "Height",IDC_STATIC,64,34,25,8
+    EDITTEXT        IDC_EDIT_HEIGHT,90,31,28,14,ES_AUTOHSCROLL
+    LTEXT           "FPS",IDC_STATIC,123,34,13,8
+    EDITTEXT        IDC_EDIT_FPS,142,31,29,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_VIDEO_WINDOW,"Static",SS_BLACKFRAME,7,49,374,253
+    PUSHBUTTON      "开始捕捉",IDC_BTN_START,331,29,50,14
 END
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -127,15 +125,13 @@ BEGIN
     BEGIN
         BLOCK "080404B0"
         BEGIN
-            VALUE "CompanyName", "\0"
-            VALUE "FileDescription", "VCamDemo Microsoft 基础类应用程序\0"
-            VALUE "FileVersion", "1, 0, 0, 1\0"
-            VALUE "InternalName", "VCamDemo\0"
-            VALUE "LegalCopyright", "版权所有 (C) 2010\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "VCamDemo.EXE\0"
-            VALUE "ProductName", "VCamDemo 应用程序\0"
-            VALUE "ProductVersion", "1, 0, 0, 1\0"
+            VALUE "FileDescription", "VCamDemo Microsoft 基础类应用程序"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "VCamDemo"
+            VALUE "LegalCopyright", "版权所有 (C) 2010"
+            VALUE "OriginalFilename", "VCamDemo.EXE"
+            VALUE "ProductName", "VCamDemo 应用程序"
+            VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END
     BLOCK "VarFileInfo"
@@ -144,8 +140,6 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -153,7 +147,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -166,9 +160,9 @@ BEGIN
     IDD_VCAMDEMO_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 257
+        RIGHTMARGIN, 381
         TOPMARGIN, 7
-        BOTTOMMARGIN, 220
+        BOTTOMMARGIN, 302
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -179,7 +173,7 @@ END
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_ABOUTBOX            "关于 VCamDemo(&A)..."
 END

@@ -93,6 +93,7 @@ BEGIN_MESSAGE_MAP(CVCamDemoDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO_CAMERA_LIST, OnSelchangeComboCameraList)
 	ON_WM_TIMER()
 	//}}AFX_MSG_MAP
+	ON_BN_CLICKED(IDC_BTN_START, &CVCamDemoDlg::OnBnClickedBtnStart)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -124,11 +125,14 @@ BOOL CVCamDemoDlg::OnInitDialog()
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
+
+	m_ctlCameras = (CComboBox*)GetDlgItem(IDC_COMBO_CAMERA_LIST);
+	GetDlgItem(IDC_VIDEO_WINDOW, &m_ctlRender);
 	
 	// TODO: Add extra initialization here
 	//==================在这初始化摄像头列表
-	SetDlgItemInt(IDC_EDIT_WIDTH, 320);
-	SetDlgItemInt(IDC_EDIT_HEIGHT, 240);
+	SetDlgItemInt(IDC_EDIT_WIDTH, 1280);// 320);
+	SetDlgItemInt(IDC_EDIT_HEIGHT, 720); //240);
 	VideoCaptureModule_Initialize();
 	VideoCaptureModule_GetCameraCount(m_nCameraCount);
 	m_pwstrCameraNames = new WCHAR[1000];
@@ -136,8 +140,9 @@ BOOL CVCamDemoDlg::OnInitDialog()
 	PhaseString(m_pwstrCameraNames, L';');//把得到的摄像头字符串分解到字符串数组中
 	InitCameraList();
 	m_pFrameData = new BYTE[MAX_WIDTH * MAX_HEIGHT * 3];
+
 	//==================在这初始化摄像头列表
-	VCam_Initialize();
+	//VCam_Initialize();
 	//==================初始化虚拟视频头输出
 	
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -215,13 +220,12 @@ void CVCamDemoDlg::PhaseString(const WCHAR *pszStrIn, WCHAR cTok)
 // 初始化已选中摄像头列表
 void CVCamDemoDlg::InitCameraList()
 {
-	
 	int nUSBNumber = 0;
-	((CComboBox*)GetDlgItem(IDC_COMBO_CAMERA_LIST))->ResetContent();//消除现有所有内容
+	m_ctlCameras->ResetContent();//消除现有所有内容
 	int nCameraNumber = 0;
 	while(nCameraNumber < m_nCameraCount)
 	{
-		((CComboBox*)GetDlgItem(IDC_COMBO_CAMERA_LIST))->AddString(m_pwstrCameraNameList[nCameraNumber]);
+		m_ctlCameras->AddString(m_pwstrCameraNameList[nCameraNumber]);
 		if (_tcsstr(m_pwstrCameraNameList[nCameraNumber],_T("USB"))||_tcsstr(m_pwstrCameraNameList[nCameraNumber],_T("usb")))//;strCameraName.Find(_T("USB"))||strCameraName.Find(_T("usb")))
 		{
 			nUSBNumber = nCameraNumber;
@@ -229,7 +233,7 @@ void CVCamDemoDlg::InitCameraList()
 		nCameraNumber++;
 	};
 	
-	((CComboBox*)GetDlgItem(IDC_COMBO_CAMERA_LIST))->SetCurSel(nUSBNumber);	
+	m_ctlCameras->SetCurSel(nUSBNumber);	
 }
 
 
@@ -242,7 +246,12 @@ void CVCamDemoDlg::OnSelchangeComboCameraList()
 		m_GetFrameTimer = 0;
 	}
 	
-	int nSelectedCameraNumber=((CComboBox*)GetDlgItem(IDC_COMBO_CAMERA_LIST))->GetCurSel();//当前选中的行。
+	int nSelectedCameraNumber=m_ctlCameras->GetCurSel();//当前选中的行。
+	if (nSelectedCameraNumber < 0)
+	{
+		return;
+	}
+
 	int nWidth = GetDlgItemInt(IDC_EDIT_WIDTH);
 	int nHeight = GetDlgItemInt(IDC_EDIT_HEIGHT);
 
@@ -269,46 +278,48 @@ void CVCamDemoDlg::OnTimer(UINT nIDEvent)
 	if (nIDEvent == m_GetFrameTimer)
 	{
 		VideoCaptureModule_GetFrame(m_pFrameData, m_nWidth, m_nHeight);//取视频帧
-		DisplayCapturedBits(m_pFrameData, &m_bih, IDC_VIDEO_WINDOW);
-		VCam_OutPutFrame(m_pFrameData);//仅限320*240输出.
+		DisplayCapturedBits(m_pFrameData, &m_bih);
+		//VCam_OutPutFrame(m_pFrameData);//仅限320*240输出.
 	}
 	CDialog::OnTimer(nIDEvent);
 }
-BOOL CVCamDemoDlg::DisplayCapturedBits(BYTE *pBuffer, BITMAPINFOHEADER *pbih, UINT nIDC)//显示图像到控件上
+BOOL CVCamDemoDlg::DisplayCapturedBits(BYTE *pBuffer, BITMAPINFOHEADER *pbih)//显示图像到控件上
 {
 	// If we haven't yet snapped a still, return
 	if (!pBuffer)
 		return FALSE;
 	
-	// put bits into the preview window with StretchDIBits
-	//
-	HWND hwndStill = NULL;
-	GetDlgItem( nIDC, &hwndStill );
-	
 	RECT rc;
-	::GetWindowRect( hwndStill, &rc );
+	::GetWindowRect( m_ctlRender, &rc );
 	long lStillWidth = rc.right - rc.left;
 	long lStillHeight = rc.bottom - rc.top;
 	
-	HDC hdcStill = ::GetDC( hwndStill );
-	PAINTSTRUCT ps;
-	::BeginPaint(hwndStill, &ps);
+	HDC hdcStill = ::GetDC( m_ctlRender );
+	//PAINTSTRUCT ps;
+	//::BeginPaint(m_ctlRender, &ps);
 	
 	::SetStretchBltMode(hdcStill, COLORONCOLOR);
 	::StretchDIBits( 
 		hdcStill, 0, 0, 
-		pbih->biWidth, pbih->biHeight, 
+		lStillWidth, lStillHeight, //pbih->biWidth, pbih->biHeight, 
 		0, 0, pbih->biWidth, pbih->biHeight, 
 		pBuffer, 
 		(BITMAPINFO*) pbih, 
 		DIB_RGB_COLORS, 
 		SRCCOPY );
+
 //	RECT rect;
 	//::DrawText(hdcStill,L"test",4,&rect,1);
 
 //	::TextOut(hdcStill,0,0,L"test",4);
-	::EndPaint(hwndStill, &ps);
-	::ReleaseDC( hwndStill, hdcStill );    
+	//::EndPaint(m_ctlRender, &ps);
+	::ReleaseDC( m_ctlRender, hdcStill );    
 	
 	return TRUE;
+}
+
+void CVCamDemoDlg::OnBnClickedBtnStart()
+{
+	// TODO: Add your control notification handler code here
+	OnSelchangeComboCameraList();
 }

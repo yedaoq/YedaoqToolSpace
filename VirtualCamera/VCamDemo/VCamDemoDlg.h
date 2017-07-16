@@ -9,8 +9,8 @@
 #endif // _MSC_VER > 1000
 
 #define GETFRAME_TIMER 100
-#define MAX_WIDTH 640
-#define MAX_HEIGHT 480
+#define MAX_WIDTH 1280
+#define MAX_HEIGHT 720
 /////////////////////////////////////////////////////////////////////////////
 // CVCamDemoDlg dialog
 
@@ -58,9 +58,14 @@ public:
 	UINT_PTR	m_GetFrameTimer;   // 定时器ID 
 	BYTE*		m_pFrameData;
 	BITMAPINFOHEADER m_bih;
+
+	CComboBox*	m_ctlCameras;
+	HWND		m_ctlRender;
+
 	void		PhaseString(const WCHAR *pszStrIn, WCHAR cTok);
 	void		InitCameraList();
-	BOOL		DisplayCapturedBits(BYTE *pBuffer, BITMAPINFOHEADER *pbih, UINT nIDC);//显示图像到控件上
+	BOOL		DisplayCapturedBits(BYTE *pBuffer, BITMAPINFOHEADER *pbih);//显示图像到控件上
+	afx_msg void OnBnClickedBtnStart();
 };
 
 //{{AFX_INSERT_LOCATION}}
