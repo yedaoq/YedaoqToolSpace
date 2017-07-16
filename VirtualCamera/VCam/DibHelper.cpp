@@ -10,6 +10,7 @@
 #include <windows.h>
 #include <comdef.h>
 #include "dibhelper.h"
+#include <strsafe.h>
 
 #pragma comment(lib,"Strmiids.lib")
 #pragma comment(lib,"Quartz.lib")
@@ -62,7 +63,12 @@ HBITMAP CopyScreenToBitmap(LPRECT lpRect, BYTE *pData, BITMAPINFO *pHeader, HCUR
     hOldBitmap = (HBITMAP) SelectObject(hMemDC, hBitmap);
 
     // bitblt screen DC to memory DC
-    BitBlt(hMemDC, 0, 0, nWidth, nHeight, hScrDC, nX, nY, SRCCOPY);
+	StretchBlt(hMemDC, 0, 0, nWidth, nHeight, hScrDC, nX, nY, xScrn, yScrn, SRCCOPY);
+    //BitBlt(hMemDC, 0, 0, nWidth, nHeight, hScrDC, nX, nY, SRCCOPY);
+
+	TCHAR msg[1024];
+	_stprintf(msg, TEXT("VCam width : %d height : %d"), nWidth, nHeight);
+	OutputDebugString(msg);
 
 	// draw mouse
 	POINT pt;

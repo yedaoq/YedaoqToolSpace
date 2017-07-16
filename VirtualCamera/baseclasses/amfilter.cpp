@@ -1995,6 +1995,11 @@ CBasePin::SetMediaType(const CMediaType *pmt)
         return hr;
     }
 
+	VIDEOINFOHEADER *pVih = (VIDEOINFOHEADER*)m_mt.pbFormat;
+	TCHAR msg[1024];
+	_stprintf(msg, TEXT("VCam MediaType width : %d height : %d"), pVih->bmiHeader.biWidth, pVih->bmiHeader.biHeight);
+	OutputDebugString(msg);
+
     return NOERROR;
 }
 
