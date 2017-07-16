@@ -10,7 +10,7 @@
 // 这是一个结构最简单的Virtual Camera，希望对大家有帮助
 // ***************************************************************
 
-#include <../../baseclasses/streams.h>
+#include <streams.h>
 #include <initguid.h>
 #include "Filter.h"
 
