@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Filter", "VirtualCamera\Filter.vcproj", "{CC37DB40-57B6-4966-B2A0-2137DC988646}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VCamDemo", "VCamDemo\VCamDemo.vcproj", "{C8679C99-4288-4F30-9FE9-3E0B6A01B264}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "baseclasses", "baseclasses\baseclasses.vcproj", "{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VCam", "VCam\VCam.vcproj", "{B96D8E31-9EB0-4212-9214-18A94CC1D6BE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_MBCS|Win32 = Debug_MBCS|Win32
+		Debug|Win32 = Debug|Win32
+		Release_MBCS|Win32 = Release_MBCS|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC37DB40-57B6-4966-B2A0-2137DC988646}.Debug_MBCS|Win32.ActiveCfg = Debug|Win32
+		{CC37DB40-57B6-4966-B2A0-2137DC988646}.Debug_MBCS|Win32.Build.0 = Debug|Win32
+		{CC37DB40-57B6-4966-B2A0-2137DC988646}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CC37DB40-57B6-4966-B2A0-2137DC988646}.Debug|Win32.Build.0 = Debug|Win32
+		{CC37DB40-57B6-4966-B2A0-2137DC988646}.Release_MBCS|Win32.ActiveCfg = Release|Win32
+		{CC37DB40-57B6-4966-B2A0-2137DC988646}.Release_MBCS|Win32.Build.0 = Release|Win32
+		{CC37DB40-57B6-4966-B2A0-2137DC988646}.Release|Win32.ActiveCfg = Release|Win32
+		{CC37DB40-57B6-4966-B2A0-2137DC988646}.Release|Win32.Build.0 = Release|Win32
+		{C8679C99-4288-4F30-9FE9-3E0B6A01B264}.Debug_MBCS|Win32.ActiveCfg = Debug|Win32
+		{C8679C99-4288-4F30-9FE9-3E0B6A01B264}.Debug_MBCS|Win32.Build.0 = Debug|Win32
+		{C8679C99-4288-4F30-9FE9-3E0B6A01B264}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C8679C99-4288-4F30-9FE9-3E0B6A01B264}.Debug|Win32.Build.0 = Debug|Win32
+		{C8679C99-4288-4F30-9FE9-3E0B6A01B264}.Release_MBCS|Win32.ActiveCfg = Release|Win32
+		{C8679C99-4288-4F30-9FE9-3E0B6A01B264}.Release_MBCS|Win32.Build.0 = Release|Win32
+		{C8679C99-4288-4F30-9FE9-3E0B6A01B264}.Release|Win32.ActiveCfg = Release|Win32
+		{C8679C99-4288-4F30-9FE9-3E0B6A01B264}.Release|Win32.Build.0 = Release|Win32
+		{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}.Debug_MBCS|Win32.ActiveCfg = Debug_MBCS|Win32
+		{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}.Debug_MBCS|Win32.Build.0 = Debug_MBCS|Win32
+		{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}.Debug|Win32.Build.0 = Debug|Win32
+		{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}.Release_MBCS|Win32.ActiveCfg = Release_MBCS|Win32
+		{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}.Release_MBCS|Win32.Build.0 = Release_MBCS|Win32
+		{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}.Release|Win32.ActiveCfg = Release|Win32
+		{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}.Release|Win32.Build.0 = Release|Win32
+		{B96D8E31-9EB0-4212-9214-18A94CC1D6BE}.Debug_MBCS|Win32.ActiveCfg = Debug|Win32
+		{B96D8E31-9EB0-4212-9214-18A94CC1D6BE}.Debug_MBCS|Win32.Build.0 = Debug|Win32
+		{B96D8E31-9EB0-4212-9214-18A94CC1D6BE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B96D8E31-9EB0-4212-9214-18A94CC1D6BE}.Debug|Win32.Build.0 = Debug|Win32
+		{B96D8E31-9EB0-4212-9214-18A94CC1D6BE}.Release_MBCS|Win32.ActiveCfg = Release|Win32
+		{B96D8E31-9EB0-4212-9214-18A94CC1D6BE}.Release_MBCS|Win32.Build.0 = Release|Win32
+		{B96D8E31-9EB0-4212-9214-18A94CC1D6BE}.Release|Win32.ActiveCfg = Release|Win32
+		{B96D8E31-9EB0-4212-9214-18A94CC1D6BE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
