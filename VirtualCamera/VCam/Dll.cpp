@@ -141,14 +141,3 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 	return DllEntryPoint((HINSTANCE)(hModule), dwReason, lpReserved);
 }
 
-// STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID * ppvObj) 
-// { 
-// 	HRESULT hr = E_OUTOFMEMORY; 
-// 	*ppvObj = &g_Templates;
-// 	return S_OK;
-// } 
-
-// STDAPI DllCanUnloadNow()
-// {
-// 	return g_cDllRef > 0 ? S_FALSE : S_OK;
-// }

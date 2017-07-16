@@ -1,7 +1,6 @@
-LIBRARY     VCam.ax
 EXPORTS
-            DllMain                 PRIVATE
-            DllGetClassObject       PRIVATE
-            DllCanUnloadNow         PRIVATE
-            DllRegisterServer       PRIVATE
-            DllUnregisterServer     PRIVATE
+    DllMain                 
+    DllGetClassObject       
+    DllCanUnloadNow         
+    DllRegisterServer       
+    DllUnregisterServer     
