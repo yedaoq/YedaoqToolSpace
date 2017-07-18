@@ -12,9 +12,6 @@
 #include "dibhelper.h"
 #include <strsafe.h>
 
-#pragma comment(lib,"Strmiids.lib")
-#pragma comment(lib,"Quartz.lib")
-
 HBITMAP CopyScreenToBitmap(LPRECT lpRect, BYTE *pData, BITMAPINFO *pHeader, HCURSOR hCursor)
 {
     HDC         hScrDC, hMemDC;         // screen DC and memory DC

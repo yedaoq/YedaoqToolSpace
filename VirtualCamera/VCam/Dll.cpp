@@ -15,6 +15,8 @@
 #include "Filter.h"
 
 #pragma comment(lib, "Winmm")
+#pragma comment(lib,"Strmiids.lib")
+#pragma comment(lib,"Quartz.lib")
 
 #ifdef _DEBUG
 	#pragma comment(lib, "strmbasd")
