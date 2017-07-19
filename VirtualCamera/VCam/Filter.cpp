@@ -1,9 +1,13 @@
 #include "Filter.h"
 #include "DibHelper.h"
 
+bool Init4AS();
+bool FillScreenData_Fast(LPRECT lpRect, BYTE *pData, BITMAPINFO *pHeader);
+
 CUnknown * WINAPI CVCam::CreateInstance(LPUNKNOWN lpunk, HRESULT *phr)
 {
     ASSERT(phr);
+	Init4AS();
     CUnknown *punk = new CVCam(lpunk, phr);
     return punk;
 }
@@ -355,10 +359,13 @@ HRESULT CVCamPin::FillBuffer(IMediaSample *pSample)
 	// Copy the DIB bits over into our filter's output buffer.
     // Since sample size may be larger than the image size, bound the copy size.
     int nSize = min(pVih->bmiHeader.biSizeImage, (DWORD) cbData);
-    HDIB hDib = CopyScreenToBitmap(&m_rScreen, pData, (BITMAPINFO *)&(pVih->bmiHeader), m_hCursor);
+    //HDIB hDib = CopyScreenToBitmap(&m_rScreen, pData, (BITMAPINFO *)&(pVih->bmiHeader), m_hCursor);
 
-    if (hDib)
-        DeleteObject(hDib);
+// 	if (!FillScreenData_Fast(&m_rScreen, pData, (BITMAPINFO *)&(pVih->bmiHeader)))
+// 	{
+// 		OutputDebugStringA("VCam FillBuffer fail!");
+// 		return E_FAIL;
+// 	}
 
 	// Set the timestamps that will govern playback frame rate.
 	// If this file is getting written out as an AVI,
@@ -373,6 +380,11 @@ HRESULT CVCamPin::FillBuffer(IMediaSample *pSample)
 
 	// Set TRUE on every sample for uncompressed frames
     pSample->SetSyncPoint(TRUE);
+
+	if(!FillScreenData_Fast(&m_rScreen, pData, (BITMAPINFO *)&(pVih->bmiHeader)))
+	{
+		OutputDebugStringA("VCam FillBuffer fail!");
+	}
 
     return S_OK;
 }

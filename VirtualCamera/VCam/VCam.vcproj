@@ -177,6 +177,10 @@
 			Name="src"
 			>
 			<File
+				RelativePath=".\AsImage.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DibHelper.cpp"
 				>
 			</File>
