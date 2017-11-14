@@ -31,6 +31,7 @@ DEFINE_GUID(CLSID_VirtualCamera,
 #define g_wszFilterName    L"Virtual Camera (By bifei)"
 
 LONG		g_cDllRef = 0;
+HANDLE		g_hModule = NULL;
 
 // Filter setup data
 const AMOVIESETUP_MEDIATYPE sudOpPinTypes =
@@ -140,6 +141,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
                       DWORD  dwReason, 
                       LPVOID lpReserved)
 {
+	g_hModule = hModule;
 	return DllEntryPoint((HINSTANCE)(hModule), dwReason, lpReserved);
 }
 

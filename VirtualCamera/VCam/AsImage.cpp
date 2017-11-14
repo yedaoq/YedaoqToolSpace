@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <tchar.h>
+#include <shlwapi.h>
 
 const wchar_t SHARING_WINDOW_CLASS[] = TEXT("sharing frame");
 
@@ -19,6 +20,12 @@ int				mem_frame_bmp_height_ = 0;
 
 SIZE			cursor_size_;
 HCURSOR			cursor_handle_ = NULL;
+
+bool			blt_copy_layered_ = true;
+
+extern HANDLE	g_hModule;
+
+#pragma comment(lib, "shlwapi.lib")
 
 
 void debug_output_win(__in const WCHAR* szMsg, ...)
@@ -48,6 +55,24 @@ bool Init4AS()
 		ReleaseDC(NULL, screen_dc);
 
 		mem_screen_bmp_prev_ = SelectObject(mem_dc_, mem_screen_bmp_);
+	}
+
+	TCHAR buf[1024];
+	if (GetModuleFileName((HMODULE)g_hModule, buf, ARRAYSIZE(buf)) > 0)
+	{
+		::PathRemoveExtension(buf);
+		::PathAddExtension(buf, TEXT(".ini"));
+
+		int tmp = GetPrivateProfileInt(TEXT("CONFIG"), TEXT("BltCaptureLayered"), -1, buf);
+		if (-1 == tmp)
+		{
+			blt_copy_layered_ = true;
+			::WritePrivateProfileString(TEXT("CONFIG"), TEXT("BltCaptureLayered"), TEXT("1"), buf);
+		}
+		else
+		{
+			blt_copy_layered_ = (0 != tmp);
+		}
 	}
 	
 	return true;
@@ -119,7 +144,7 @@ bool FillScreenData(LPRECT lpRect, BYTE *pData, BITMAPINFO *pHeader, HCURSOR hCu
 		mem_frame_bmp_prev_ = SelectObject(mem_frame_dc_, mem_frame_bmp_);
 	}
 
-	StretchBlt(mem_frame_dc_, 0, 0, mem_frame_bmp_width_, mem_frame_bmp_height_, monitor_dc, 0, 0, monitor_width, monitor_height, SRCCOPY | CAPTUREBLT);
+	StretchBlt(mem_frame_dc_, 0, 0, mem_frame_bmp_width_, mem_frame_bmp_height_, monitor_dc, 0, 0, monitor_width, monitor_height, SRCCOPY /*| CAPTUREBLT*/);
 
 }
 
@@ -177,7 +202,7 @@ bool FillScreenData_Fast(LPRECT lpRect, BYTE *pData, BITMAPINFO *pHeader)
 // 		}
 	}
 
-	debug_output_win(TEXT("VCam Device : %s, Window : %08x"), display_device, indicator_window_);
+	//debug_output_win(TEXT("VCam Device : %s, Window : %08x"), display_device, indicator_window_);
 
 	HDC monitor_dc = CreateDC(display_device, display_device, NULL, NULL);
 	if (NULL == monitor_dc)
@@ -204,10 +229,12 @@ bool FillScreenData_Fast(LPRECT lpRect, BYTE *pData, BITMAPINFO *pHeader)
 		mem_frame_bmp_ = CreateCompatibleBitmap(monitor_dc, mem_frame_bmp_width_, mem_frame_bmp_height_);
 	}
 
-	debug_output_win(TEXT("VCam blt : (%d,%d), (%d, %d)"), monitor_width, monitor_height, mem_frame_bmp_width_, mem_frame_bmp_height_);
+	//debug_output_win(TEXT("VCam blt : (%d,%d), (%d, %d)"), monitor_width, monitor_height, mem_frame_bmp_width_, mem_frame_bmp_height_);
 
 	mem_frame_bmp_prev_ = SelectObject(mem_frame_dc_, mem_frame_bmp_);
-	StretchBlt(mem_frame_dc_, 0, 0, mem_frame_bmp_width_, mem_frame_bmp_height_, monitor_dc, 0, 0, monitor_width, monitor_height, SRCCOPY | CAPTUREBLT);
+
+	DWORD copy_flag = blt_copy_layered_ ? (SRCCOPY | CAPTUREBLT) : (SRCCOPY);
+	StretchBlt(mem_frame_dc_, 0, 0, mem_frame_bmp_width_, mem_frame_bmp_height_, monitor_dc, 0, 0, monitor_width, monitor_height, copy_flag);
 
 	DeleteDC(monitor_dc);
 
@@ -226,7 +253,7 @@ bool FillScreenData_Fast(LPRECT lpRect, BYTE *pData, BITMAPINFO *pHeader)
 			{
 				cursor_handle_ = cursor_info.hCursor;
 				cursor_size_ = GetCursorSize(cursor_info.hCursor);
-				debug_output_win(TEXT("VCam cursor size : (%d,%d)"), cursor_size_.cx, cursor_size_.cy);
+				//debug_output_win(TEXT("VCam cursor size : (%d,%d)"), cursor_size_.cx, cursor_size_.cy);
 			}
 
 			if (pt.x + cursor_size_.cx > monitor_width) 
@@ -244,18 +271,18 @@ bool FillScreenData_Fast(LPRECT lpRect, BYTE *pData, BITMAPINFO *pHeader)
 			int stretch_y = pt.y * mem_frame_bmp_height_ / monitor_height;
 			int stretch_height = cursor_size_.cy * mem_frame_bmp_height_ / monitor_height;
 
-			debug_output_win(TEXT("VCam draw cursor : (%d,%d, %d, %d)"), stretch_x, stretch_y, stretch_width, stretch_height);
+			//debug_output_win(TEXT("VCam draw cursor : (%d,%d, %d, %d)"), stretch_x, stretch_y, stretch_width, stretch_height);
 
 			DrawIconEx(mem_frame_dc_, stretch_x, stretch_y, cursor_info.hCursor, stretch_width, stretch_height, 0, NULL, DI_NORMAL);
 		}
 		else
 		{
-			debug_output_win(TEXT("Vcam : cursor is out of monitor!"));
+			//debug_output_win(TEXT("Vcam : cursor is out of monitor!"));
 		}
 	}
 	else
 	{
-		debug_output_win(TEXT("Vcam : cursor is hide!"));
+		//debug_output_win(TEXT("Vcam : cursor is hide!"));
 	}
 
 	SelectObject(mem_frame_dc_, mem_frame_bmp_prev_);
