@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ASTool", "ASTool\ASTool.vcproj", "{E891A035-F868-44DD-850B-17A8A485EA0D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toolRecord", "toolRecord\toolRecord.vcproj", "{223F511B-6DEB-443E-94FC-DDF224AD0B1C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E891A035-F868-44DD-850B-17A8A485EA0D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E891A035-F868-44DD-850B-17A8A485EA0D}.Debug|Win32.Build.0 = Debug|Win32
+		{E891A035-F868-44DD-850B-17A8A485EA0D}.Release|Win32.ActiveCfg = Release|Win32
+		{E891A035-F868-44DD-850B-17A8A485EA0D}.Release|Win32.Build.0 = Release|Win32
+		{223F511B-6DEB-443E-94FC-DDF224AD0B1C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{223F511B-6DEB-443E-94FC-DDF224AD0B1C}.Debug|Win32.Build.0 = Debug|Win32
+		{223F511B-6DEB-443E-94FC-DDF224AD0B1C}.Release|Win32.ActiveCfg = Release|Win32
+		{223F511B-6DEB-443E-94FC-DDF224AD0B1C}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
