@@ -3,6 +3,7 @@
 #include "..\resource.h"
 #include "common.h"
 
+class ASFrameRes;
 
 class CDialogInfo : public CDialogImpl<CDialogInfo>, public CUpdateUI<CDialogInfo>
 {
@@ -26,6 +27,9 @@ public:
 
 	END_MSG_MAP()
 
+public:
+	void SetFrameRes(ASFrameRes* res);
+
 protected:
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnDrawItem(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
@@ -41,5 +45,6 @@ protected:
 
 protected:
 	WTL::CRichEditCtrl		ctl_edt_info_;
+	ASFrameRes*				frame_res_;
 	int						frame_index_;
 };

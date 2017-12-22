@@ -3,6 +3,8 @@
 #include "..\resource.h"
 #include "common.h"
 
+class ASFrameRes;
+
 class CDialogImage : public CDialogImpl<CDialogImage>, public CUpdateUI<CDialogImage>
 {
 public:
@@ -44,37 +46,44 @@ public:
 	void SetAreaRefLineShow(bool v);
 	void SetScale(bool v);
 	void SetMousePos(const POINT& pt);
+
 	void Refresh();
 
-	HBITMAP GetImage() { return frame_image_; }
+	//void SetASRecordPackage(IASRecordPackage* pkg);
+	void SetFrameRes(ASFrameRes* res);
+
+	HBITMAP GetImage() { return composit_frame_image_; }
 
 public:
 	void OnPicMainLButtonDown(WPARAM wParam,LPARAM lParam);
 	void OnPicMainLButtonUp(WPARAM wParam,LPARAM lParam);
 	void OnPicMainMouseMove(WPARAM wParam,LPARAM lParam);
-	void OnMettingLoaded();
 
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 protected:
 	void InitImageTick();
-	void InitImageBackgroundTransparent();
+	HBRUSH InitImageBackgroundBrush();
 	void ReCreateFrameImageForSize(int width, int height);
 	void ClearFrameImageContent();
 
 	void ResetScrollRange();
-	void ScrollToContent();
+	void ScrollViewToArea(const RECT& area);
 
 	void DrawMainPic(LPDRAWITEMSTRUCT lpDrawItem, HBITMAP hbp);
 	void DrawMainFrameAsThumb(LPDRAWITEMSTRUCT lpDrawItem);
 	void DrawMainCompPicAsThumb(LPDRAWITEMSTRUCT lpDrawItem);
-	void DrawImageArea(LPDRAWITEMSTRUCT lpDrawItem, RECT* area);
+	void DrawImageArea(LPDRAWITEMSTRUCT lpDrawItem, const RECT* area);
 	void DrawImageAreaLine(LPDRAWITEMSTRUCT lpDrawItem, int start_x, int start_y, int end_x, int end_y);
 	void DrawImageRegion(LPDRAWITEMSTRUCT lpDrawItem);
 	void DrawImageRegion(LPDRAWITEMSTRUCT lpDrawItem, HRGN rgn, HBRUSH brush);
 	void DrawTickBar(LPDRAWITEMSTRUCT lpDrawItem, HBITMAP bmp, int x, int y, int bold_x, int bold_y, int bold_right, int bold_bottom);
 
 protected:
+	//IASRecordPackage*	record_package_;
+	//const ASRecordFrameData*	record_current_frame_;
+	ASFrameRes*			frame_res_;
+
 	HWND				hwnd_main_;
 
 	WTL::CScrollBar		ctl_scroll_v_;
@@ -101,19 +110,15 @@ protected:
 	HBITMAP				image_tick_v_;
 	HBITMAP				image_tick_h_;
 
-	HBITMAP				image_background_transparent_;
 	HBRUSH				brush_background_transparent_;
 
 	HPEN				pen_area_refline_;
 
-// 	HBITMAP				image_tick_grid_;
-// 	HBRUSH				image_tick_grid_brush_;
-
 protected:
 	HDC					dc_memory_[2];
-	HBITMAP				frame_image_;
-	int					frame_image_width_;
-	int					frame_image_height_;
+	HBITMAP				composit_frame_image_;
+	int					composit_frame_image_width_;
+	int					composit_frame_image_height_;
 
 	RECT				frame_capture_rc_;
 

@@ -6,30 +6,40 @@
 
 #define TOOLRECORD_DLL_NAME TEXT("toolRecord.dll")
 
-TCHAR zoom_dir_[MAX_PATH * 2];
+TCHAR zoom_bin_path_[MAX_PATH * 2] = TEXT("");
+TCHAR zoom_log_path_[MAX_PATH * 2] = TEXT("");
 TCHAR zoom_exe_name_[MAX_PATH] = TEXT("Zoom.exe");
 TCHAR tool_err_[1024] = TEXT("");
 
-bool GetZoomDir(LPTSTR buf, int buf_len)
+bool GetProductBinDir(LPTSTR buf, int buf_len)
 {
-	DWORD dwType;
-	TCHAR szVal[MAX_PATH * 2];
-	DWORD dwSize = sizeof(szVal);
-	LSTATUS result = SHGetValue(HKEY_CLASSES_ROOT, TEXT("ZoomRecording\\DefaultIcon"), TEXT(""), &dwType, szVal, &dwSize);
-	if (ERROR_SUCCESS != result)
-	{
-		return false;
-	}
-
-	LPTSTR tail = _tcsstr(szVal + 1, TEXT("Zoom.exe"));
-	if (!tail)
-	{
-		return false;
-	}
-
-	*tail = 0;
-	_tcscpy_s(buf, buf_len, szVal + 1);
+	StringCchCopy(buf, buf_len, zoom_bin_path_);
 	return true;
+}
+
+bool GetProductLogDir(LPTSTR buf, int buf_len)
+{
+	StringCchCopy(buf, buf_len, zoom_log_path_);
+	return true;
+}
+
+time_duration time_duration::FromMiniseconds( LONGLONG miniseconds )
+{
+	LONGLONG seconds = miniseconds / 1000;
+	time_duration result = FromSeconds((LONG)seconds);
+	result.miniseconds = miniseconds % 1000;
+	return result;
+}
+
+time_duration time_duration::FromSeconds( LONG seconds )
+{
+	time_duration result;
+	result.miniseconds = 0;
+	result.seconds = seconds % 60;
+	LONG minutes = seconds / 60;
+	result.minute = minutes % 60;
+	result.hour = (unsigned short)(minutes / 60);
+	return result;
 }
 
 bool IsRunAsAdmin()
@@ -57,7 +67,10 @@ bool RemoveFile( LPCTSTR path )
 		return true;
 
 	TCHAR buf[MAX_PATH * 2];
-	int path_len = StringCchCopy(buf, ARRAYSIZE(buf), path);
+	if (S_OK != StringCchCopy(buf, ARRAYSIZE(buf), path))
+		return false;
+
+	int path_len = _tcslen(buf);
 
 	for (int i = 1; i < 10000; ++i)
 	{
@@ -154,16 +167,19 @@ bool LaunchUacApp( LPCTSTR app, LPCTSTR params, bool wait )
 
 bool IsToolRecordInstalled()
 {
-	::PathAppend(zoom_dir_, TOOLRECORD_DLL_NAME);
-	DWORD file_attr = ::GetFileAttributes(zoom_dir_);
-	::PathRemoveFileSpec(zoom_dir_);
+	TCHAR path_dst[MAX_PATH * 2];
+	if (!GetProductBinDir(path_dst, ARRAYSIZE(path_dst)))
+		return false;
+
+	::PathAppend(path_dst, TOOLRECORD_DLL_NAME);
+	DWORD file_attr = ::GetFileAttributes(path_dst);
 	return INVALID_FILE_ATTRIBUTES != file_attr;
 }
 
 bool InstallToolRecord( bool adjust_uac )
 {
 	TCHAR path_dst[MAX_PATH * 2];
-	if (!GetZoomDir(path_dst, ARRAYSIZE(path_dst)))
+	if (!GetProductBinDir(path_dst, ARRAYSIZE(path_dst)))
 	{
 		SetToolErrorMsg(TEXT("无法定位Zoom安装目录！"));
 		return false;
@@ -196,7 +212,7 @@ bool InstallToolRecord( bool adjust_uac )
 bool UninstallToolRecord( bool adjust_uac )
 {
 	TCHAR path_dst[MAX_PATH * 2];
-	if (!GetZoomDir(path_dst, ARRAYSIZE(path_dst)))
+	if (!GetProductBinDir(path_dst, ARRAYSIZE(path_dst)))
 	{
 		return false;
 	}
@@ -239,4 +255,69 @@ bool IsAppLaunchForInstallToolRecord(LPCTSTR cmd_line)
 	}
 
 	return false;
+}
+
+bool CheckWindowsMenuItem( HMENU menu, DWORD item_id, bool check )
+{
+	DWORD check_flag = check ? MF_CHECKED : MF_UNCHECKED;
+	DWORD ret = CheckMenuItem(menu, ID_ASIMG_ENABLE, MF_BYCOMMAND | check_flag);
+	return -1 != ret;
+}
+
+bool IsWindowsMenuItemChecked( HMENU menu, DWORD item_id, bool default )
+{
+	MENUITEMINFO mii = {0};
+	mii.cbSize = sizeof(mii);
+	mii.fMask = MIIM_STATE;
+	if (GetMenuItemInfo(menu, item_id, FALSE, &mii))
+	{
+		return 0 != (mii.fState & MFS_CHECKED);
+	}
+
+	return default;
+}
+
+bool SetProduct( EnumZoomProduct product )
+{
+	switch(product)
+	{
+	case PRODUCT_ZOOM:
+		{
+			DWORD dwType;
+			TCHAR szVal[MAX_PATH * 2];
+			DWORD dwSize = sizeof(szVal);
+			LSTATUS result = SHGetValue(HKEY_CLASSES_ROOT, TEXT("ZoomRecording\\DefaultIcon"), TEXT(""), &dwType, szVal, &dwSize);
+			if (ERROR_SUCCESS == result)
+			{
+				LPTSTR tail = _tcsstr(szVal + 1, TEXT("Zoom.exe"));
+				if (tail)
+				{
+					*tail = 0;
+					_tcscpy_s(zoom_bin_path_, ARRAYSIZE(zoom_bin_path_), szVal + 1);
+				}
+			}
+
+			SHGetSpecialFolderPath(NULL, zoom_log_path_, CSIDL_APPDATA, FALSE);
+			::PathAppend(zoom_log_path_, TEXT("zoom"));
+
+			if (!*zoom_bin_path_)
+			{
+				StringCchCopy(zoom_bin_path_, ARRAYSIZE(zoom_bin_path_), zoom_log_path_);
+				::PathAppend(zoom_bin_path_, TEXT("bin"));
+			}
+
+			::PathAppend(zoom_log_path_, TEXT("logs"));
+
+			
+			return true;
+		}
+
+	}
+
+	return true;
+}
+
+__int64 GetTimeDeltaMiniseconds( const FILETIME& t1, const FILETIME& t2 )
+{
+	return ((__int64&)t1 - (__int64&)t2) / 10000;
 }

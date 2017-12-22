@@ -20,7 +20,7 @@ extern "C" __declspec(dllexport) bool log_init(LPCTSTR log_file_path)
 		return false;
 	}
 
-	//OutputDebugString(log_file_path);
+	OutputDebugString(log_file_path);
 
 	_tcscpy_s(img_log_file_path_, ARRAYSIZE(img_log_file_path_) - 1, log_file_path);
 	::PathRenameExtension(img_log_file_path_, TEXT(".imgs"));

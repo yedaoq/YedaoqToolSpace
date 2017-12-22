@@ -53,8 +53,11 @@ public:
 
 	void CloseDialog(int nVal);
 
-protected:
+public:
 	bool InitFileList();
+
+protected:
+	
 	bool InitFilterCombobox();
 
 	bool InitSciLexerCtrl();

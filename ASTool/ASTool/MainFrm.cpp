@@ -9,6 +9,8 @@
 #include "ASToolView.h"
 #include "MainFrm.h"
 #include "ASLogView.h"
+#include "util/util.h"
+#include "ASImgView.h"
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
@@ -25,7 +27,6 @@ BOOL CMainFrame::OnIdle()
 
 LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-
 	CreateSimpleStatusBar();
 
 	m_hWndClient = m_view.Create(m_hWnd, rcDefault, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, WS_EX_CLIENTEDGE);
@@ -39,6 +40,17 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	CMenuHandle menuMain = GetMenu();
 	m_view.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
+
+	SetProduct(PRODUCT_ZOOM);
+
+	CheckWindowsMenuItem(menuMain, ID_ASIMG_ENABLE, IsToolRecordInstalled());
+
+	view_log_.Create(m_view);
+	m_view.AddPage(view_log_.m_hWnd, _T("Log"));
+
+	view_as_img_.Create(m_view);
+	m_view.AddPage(view_as_img_.m_hWnd, _T("AS Image"));
+	view_as_img_.SetStatusBar(m_hWndStatusBar);
 
 	return 0;
 }
@@ -112,5 +124,31 @@ LRESULT CMainFrame::OnWindowActivate(WORD /*wNotifyCode*/, WORD wID, HWND /*hWnd
 	int nPage = wID - ID_WINDOW_TABFIRST;
 	m_view.SetActivePage(nPage);
 
+	return 0;
+}
+
+LRESULT CMainFrame::OnASImgEnable( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& bHandled )
+{
+	bHandled = TRUE;
+
+	HMENU menu = GetMenu();
+	if(IsWindowsMenuItemChecked(menu, ID_ASIMG_ENABLE, false))
+	{
+		UninstallToolRecord(true);
+	}
+	else
+	{
+		InstallToolRecord(true);
+	}
+
+	CheckWindowsMenuItem(menu, ID_ASIMG_ENABLE, IsToolRecordInstalled());
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnASImgFilelist( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& bHandled )
+{
+	bHandled = TRUE;
+	view_as_img_.InitFileList();
 	return 0;
 }

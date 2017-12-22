@@ -203,6 +203,18 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;manifest"
 			>
 			<File
+				RelativePath=".\res\asimg_pause.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\asimg_play.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\asimg_right.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\ASTool.ico"
 				>
 			</File>
@@ -323,11 +335,31 @@
 			Name="asimg"
 			>
 			<File
+				RelativePath=".\asimg\ASFrameRes.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\asimg\ASFrameRes.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ASImgView.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\ASImgView.h"
+				>
+			</File>
+			<File
+				RelativePath=".\asimg\ASRecordPackage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\asimg\ASRecordPackage_CptHost.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\asimg\ASRecordPackage_CptHost.h"
 				>
 			</File>
 			<File

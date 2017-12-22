@@ -62,7 +62,7 @@ IDD_ASIMG_FRAMEINFO DIALOGEX 0, 0, 172, 189
 STYLE DS_SETFONT | DS_CONTROL | WS_CHILD | WS_VISIBLE
 FONT 8, "Consolas", 400, 0, 0x0
 BEGIN
-    CONTROL         "",IDC_RESULT, "RichEdit20W",WS_BORDER | WS_TABSTOP | 0x884,7,7,158,175
+    CONTROL         "",IDC_RESULT,"RichEdit20W",WS_BORDER | WS_TABSTOP | 0x884,7,7,158,175
 END
 
 IDD_ASIMG_THUMB DIALOGEX 0, 0, 184, 308
@@ -90,9 +90,8 @@ BEGIN
     CONTROL         "v tick",IDC_TICK_V,"Button",BS_OWNERDRAW | WS_TABSTOP,0,22,20,203
 END
 
-IDD_ASIMG_MAIN DIALOGEX 0, 0, 831, 477
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS
-CAPTION "toolReplayer"
+IDD_ASIMG_FORM DIALOGEX 0, 0, 832, 478
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_THICKFRAME
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,774,7,50,14
@@ -147,6 +146,12 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 86
     END
+
+    IDD_ASIMG_FORM, DIALOG
+    BEGIN
+        RIGHTMARGIN, 831
+        BOTTOMMARGIN, 477
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -200,6 +205,7 @@ BEGIN
     BEGIN
         MENUITEM "启用",                          ID_ASIMG_ENABLE
         MENUITEM "显示缩略图",                       ID_ASIMG_THUMB
+        MENUITEM "重新获取录像列表",                    ID_ASIMG_FILELIST
     END
     POPUP "&Help"
     BEGIN
@@ -253,9 +259,9 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\ASTool.ico"
-IDI_ASIMG_RIGHT               ICON              "res\\asimg_right.ico"
-IDI_ASIMG_PAUSE               ICON              "res\\asimg_pause.ico"
-IDI_ASIMG_PLAY                ICON              "res\\asimg_play.ico"
+IDI_ASIMG_RIGHT         ICON                    "res\\asimg_right.ico"
+IDI_ASIMG_PAUSE         ICON                    "res\\asimg_pause.ico"
+IDI_ASIMG_PLAY          ICON                    "res\\asimg_play.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

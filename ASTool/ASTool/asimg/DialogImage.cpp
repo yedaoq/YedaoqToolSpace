@@ -1,23 +1,56 @@
 #include "StdAfx.h"
 #include "DialogImage.h"
+#include "ASFrameRes.h"
 
 typedef LRESULT(CALLBACK *fWindowProc)(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WindowProc_PicMain(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 static fWindowProc		g_win_proc_pic_main = 0;
 static CDialogImage*	g_dialog_image = 0;
 
+// void ImageBackgroundBrush::Init()
+// {
+// 	HDC dc = GetDC(NULL);
+// 	image_ = CreateCompatibleBitmap(dc, 20, 20);
+// 	HDC dc_memory = CreateCompatibleDC(dc);
+// 	ReleaseDC(NULL, dc);
+// 
+// 	HGLOBAL obj_prev = SelectObject(dc_memory, image_);
+// 	HBRUSH brush_white = CreateSolidBrush(0xFFFFFF);
+// 	HBRUSH brush_gray = CreateSolidBrush(0xDDDDDD);
+// 
+// 	for (int x = 0; x <= 2; ++x)
+// 	{
+// 		for (int y = 0; y < 2; ++y)
+// 		{
+// 			RECT rc = {x * 10, y * 10, 0, 0};
+// 			rc.right = rc.left + 10;
+// 			rc.bottom = rc.top + 10;
+// 
+// 			FillRect(dc_memory, &rc, ((x + y) % 2) ? brush_gray : brush_white );
+// 		}
+// 	}
+// 	SelectObject(dc_memory, obj_prev);
+// 
+// 	DeleteDC(dc_memory);
+// 	DeleteObject(brush_white);
+// 	DeleteObject(brush_gray);
+// 
+// 	brush_ = CreatePatternBrush(image_);
+// 	DeleteObject(image_);
+// }
+
 CDialogImage::CDialogImage(void)
 {
-	frame_image_height_ = -1;
-	frame_image_width_ = -1;
-	frame_image_ = NULL;
+	composit_frame_image_height_ = -1;
+	composit_frame_image_width_ = -1;
+	composit_frame_image_ = NULL;
 
 	memset(region_brushs_, 0, sizeof(region_brushs_));
 	memset(region_handles_, 0, sizeof(region_handles_));
 	memset(region_show_flags_, 0, sizeof(region_show_flags_));
 
 	memset(dc_memory_, 0,sizeof(dc_memory_));
-	frame_image_ = NULL;
+	composit_frame_image_ = NULL;
 
 	render_image_erase_ = false;
 	render_region_fill_ = false;
@@ -41,9 +74,9 @@ CDialogImage::~CDialogImage(void)
 		}
 	}
 
-	if (NULL != frame_image_)
+	if (NULL != composit_frame_image_)
 	{
-		DeleteObject(frame_image_);
+		DeleteObject(composit_frame_image_);
 	}
 
 	for (int i = 0; i < ARRAYSIZE(dc_memory_); ++i)
@@ -82,7 +115,7 @@ LRESULT CDialogImage::OnInitDialog( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
 	SetBkColor(dc_memory_[0], COLOR_BTNFACE);
 
 	InitImageTick();
-	InitImageBackgroundTransparent();
+	brush_background_transparent_ = InitImageBackgroundBrush();
 
 	g_win_proc_pic_main = (fWindowProc)::SetWindowLongPtr(ctl_pic_main_, GWLP_WNDPROC, (LONG_PTR)WindowProc_PicMain);
 
@@ -182,10 +215,10 @@ LRESULT CDialogImage::OnVScroll( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BO
 LRESULT CDialogImage::OnHScroll( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& bHandled )
 {
 	bHandled = TRUE;
-	if (INVALID_HANDLE_VALUE == img_log_file_handle_)
-	{
-		return 0;
-	}
+// 	if (INVALID_HANDLE_VALUE == img_log_file_handle_)
+// 	{
+// 		return 0;
+// 	}
 
 	if((HWND)lParam == ctl_scroll_h_)
 	{
@@ -211,12 +244,6 @@ LRESULT CDialogImage::OnHScroll( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BO
 
 void CDialogImage::Refresh()
 {
-	if (log_block_frame_index_ < 0)
-	{
-		return;
-	}
-
-	if (log_block_frame_index_ != current_frame_index_)
 	{
 		for (int i = 0; i < ARRAYSIZE(region_handles_); ++i)
 		{
@@ -227,31 +254,30 @@ void CDialogImage::Refresh()
 			}
 		}
 
-		HBITMAP image_handle = LoadFrameImage(log_block_screen_data_);
+		frame_capture_rc_ = frame_res_->ScreenRect();
 
-		frame_capture_rc_.left = log_block_screen_data_->left;
-		frame_capture_rc_.top = log_block_screen_data_->top;
-		frame_capture_rc_.right = frame_capture_rc_.left + log_block_screen_data_->bi.bmiHeader.biWidth;
-		frame_capture_rc_.bottom = frame_capture_rc_.top + abs(log_block_screen_data_->bi.bmiHeader.biHeight);
+		ScrollViewToArea(frame_capture_rc_);
 
-		ScrollToContent();
-
-		if (frame_capture_rc_.right > frame_image_width_ || frame_capture_rc_.bottom > frame_image_height_)
+		if (frame_capture_rc_.right > composit_frame_image_width_ || frame_capture_rc_.bottom > composit_frame_image_height_)
 		{
 			ReCreateFrameImageForSize(frame_capture_rc_.right + 1, frame_capture_rc_.bottom + 1);
 			ClearFrameImageContent();
 		}
-		else if (log_block_frame_index_ < current_frame_index_ || render_image_erase_)
+		else if (frame_res_->GetFrameIndex() < current_frame_index_ || render_image_erase_)
 		{
 			ClearFrameImageContent();
 		}
 
-		
+		//save_to_bmp_file1(TEXT("D:\\a.bmp"), record_current_frame_->screen_image);
 
-		HGLOBAL obj_prev = SelectObject(dc_memory_[0], frame_image_);
-		HGLOBAL obj_prev1 = SelectObject(dc_memory_[1], image_handle);
- 		BitBlt(dc_memory_[0], frame_capture_rc_.left, frame_capture_rc_.top, frame_capture_rc_.right - frame_capture_rc_.left, frame_capture_rc_.bottom - frame_capture_rc_.top,
- 			dc_memory_[1], 0, 0, SRCCOPY);
+		HGLOBAL obj_prev = SelectObject(dc_memory_[0], composit_frame_image_);
+		HGLOBAL obj_prev1 = SelectObject(dc_memory_[1], frame_res_->ScreenImage());
+
+		DWORD err;
+		if(!::BitBlt(dc_memory_[0], frame_capture_rc_.left, frame_capture_rc_.top, frame_capture_rc_.right - frame_capture_rc_.left, frame_capture_rc_.bottom - frame_capture_rc_.top, dc_memory_[1], 0, 0, SRCCOPY))
+		{
+			err = GetLastError();
+		}
 
 		// compound with brush
 // 		int origin_x = (frame_capture_rc_.right - frame_capture_rc_.left);
@@ -266,9 +292,7 @@ void CDialogImage::Refresh()
 		SelectObject(dc_memory_[0], obj_prev);
 		SelectObject(dc_memory_[1], obj_prev1);	
 
-		DeleteObject(image_handle);
-
-		current_frame_index_ = log_block_frame_index_;
+		//save_to_bmp_file1(TEXT("D:\\b.bmp"), frame_image_);
 	}
 
 	::InvalidateRect(ctl_pic_main_, NULL, FALSE);
@@ -385,18 +409,18 @@ void CDialogImage::InitImageTick()
 
 void CDialogImage::ReCreateFrameImageForSize( int width, int height )
 {
-	if (frame_image_height_ < height || frame_image_width_ < width)
+	if (composit_frame_image_height_ < height || composit_frame_image_width_ < width)
 	{
-		if (NULL != frame_image_)
+		if (NULL != composit_frame_image_)
 		{
-			DeleteObject(frame_image_);
+			DeleteObject(composit_frame_image_);
 		}
 
-		frame_image_width_ = width;
-		frame_image_height_ = height;
+		composit_frame_image_width_ = width;
+		composit_frame_image_height_ = height;
 
 		HDC dc = GetDC();
-		frame_image_ = CreateCompatibleBitmap(dc, frame_image_width_, frame_image_height_);
+		composit_frame_image_ = CreateCompatibleBitmap(dc, composit_frame_image_width_, composit_frame_image_height_);
 		ReleaseDC(dc);
 	}
 }
@@ -405,14 +429,14 @@ void CDialogImage::DrawMainPic( LPDRAWITEMSTRUCT lpDrawItem, HBITMAP hbp )
 {
 	//FillRect(lpDrawItem->hDC, &lpDrawItem->rcItem, brush_background_transparent_);
 
-	RECT image_rc = {0, 0, frame_image_width_, frame_image_height_};
+	RECT image_rc = {0, 0, composit_frame_image_width_, composit_frame_image_height_};
 	RECT view_rc = {ctl_pic_main_scroll_x_, ctl_pic_main_scroll_y_, ctl_pic_main_scroll_x_ + lpDrawItem->rcItem.right, ctl_pic_main_scroll_y_ + lpDrawItem->rcItem.bottom};
 
 	RECT inter_rc;
 	if(!IntersectRect(&inter_rc, &view_rc, &image_rc))
 		return;
 
-	HGLOBAL obj_prev = SelectObject(dc_memory_[0], frame_image_);
+	HGLOBAL obj_prev = SelectObject(dc_memory_[0], composit_frame_image_);
 	BitBlt(lpDrawItem->hDC, inter_rc.left - view_rc.left, inter_rc.top - view_rc.top, inter_rc.right - inter_rc.left, inter_rc.bottom - inter_rc.top, dc_memory_[0], inter_rc.left - image_rc.left, inter_rc.top - image_rc.top, SRCCOPY);
 	SelectObject(dc_memory_[0], obj_prev);
 
@@ -421,12 +445,16 @@ void CDialogImage::DrawMainPic( LPDRAWITEMSTRUCT lpDrawItem, HBITMAP hbp )
 	FillRgn(lpDrawItem->hDC, rgn_tmp, brush_background_transparent_);
 	DeleteObject(rgn_tmp);
 
-	if (NULL != current_frame_cursor_image_)
+	if (NULL != frame_res_->CursorImage())
 	{
-		DrawIcon(lpDrawItem->hDC, current_frame_mouse_position_.x - ctl_pic_main_scroll_x_, current_frame_mouse_position_.y - ctl_pic_main_scroll_y_, current_frame_cursor_image_);
+		POINT cursor_pos = frame_res_->CursorPosition();
+		DrawIcon(lpDrawItem->hDC, cursor_pos.x - ctl_pic_main_scroll_x_, cursor_pos.y - ctl_pic_main_scroll_y_, frame_res_->CursorImage());
 	}	
 
-	DrawImageArea(lpDrawItem, NULL);
+	if (render_area_refline_)
+		DrawImageArea(lpDrawItem, NULL);
+
+
 	DrawImageRegion(lpDrawItem);
 }
 
@@ -500,7 +528,7 @@ void CDialogImage::DrawMainFrameAsThumb( LPDRAWITEMSTRUCT lpDrawItem )
 // 		height = frame_capture_rc_.bottom - frame_capture_rc_.top;
 // 	}
 
-	HGLOBAL obj_prev = SelectObject(dc_memory_[0], frame_image_);
+	HGLOBAL obj_prev = SelectObject(dc_memory_[0], composit_frame_image_);
 
 	if (scale)
 	{
@@ -528,44 +556,44 @@ void CDialogImage::DrawMainCompPicAsThumb( LPDRAWITEMSTRUCT lpDrawItem )
 	int x, y, width, height;
 
 	// 长宽成比例缩放
-	if ((float)frame_image_width_ / frame_image_height_ > (float)lpDrawItem->rcItem.right / lpDrawItem->rcItem.bottom)
+	if ((float)composit_frame_image_width_ / composit_frame_image_height_ > (float)lpDrawItem->rcItem.right / lpDrawItem->rcItem.bottom)
 	{
-		if (lpDrawItem->rcItem.right - 20 < frame_image_width_)
+		if (lpDrawItem->rcItem.right - 20 < composit_frame_image_width_)
 		{
 			scale = true;
-			scale_rate = (float)(lpDrawItem->rcItem.right - 20) / frame_image_width_;
+			scale_rate = (float)(lpDrawItem->rcItem.right - 20) / composit_frame_image_width_;
 		}
 	}
 	else
 	{
-		if (lpDrawItem->rcItem.bottom - 20 < frame_image_height_)
+		if (lpDrawItem->rcItem.bottom - 20 < composit_frame_image_height_)
 		{
 			scale = true;
-			scale_rate = (float)(lpDrawItem->rcItem.bottom - 20) / frame_image_height_;
+			scale_rate = (float)(lpDrawItem->rcItem.bottom - 20) / composit_frame_image_height_;
 		}
 	}
 
 	if (scale)
 	{
-		width = (int)(scale_rate * frame_image_width_);
-		height = (int)(scale_rate * frame_image_height_);
+		width = (int)(scale_rate * composit_frame_image_width_);
+		height = (int)(scale_rate * composit_frame_image_height_);
 	}
 	else
 	{
-		width = frame_image_width_;
-		height = frame_image_height_;
+		width = composit_frame_image_width_;
+		height = composit_frame_image_height_;
 		
 	}
 
 	x = (lpDrawItem->rcItem.right - width) / 2;
 	y = (lpDrawItem->rcItem.bottom - height) / 2;
 
-	HGLOBAL obj_prev = SelectObject(dc_memory_[0], frame_image_);
+	HGLOBAL obj_prev = SelectObject(dc_memory_[0], composit_frame_image_);
 
 	if (scale)
 	{
 		SetStretchBltMode(lpDrawItem->hDC,STRETCH_HALFTONE); 
-		StretchBlt(lpDrawItem->hDC, x, y, width, height, dc_memory_[0], 0, 0, frame_image_width_, frame_image_height_, SRCCOPY);
+		StretchBlt(lpDrawItem->hDC, x, y, width, height, dc_memory_[0], 0, 0, composit_frame_image_width_, composit_frame_image_height_, SRCCOPY);
 	}
 	else
 	{
@@ -580,17 +608,17 @@ void CDialogImage::DrawMainCompPicAsThumb( LPDRAWITEMSTRUCT lpDrawItem )
 	DeleteObject(rgn_tmp);
 }
 
-void CDialogImage::DrawImageArea( LPDRAWITEMSTRUCT lpDrawItem, RECT* area )
+void CDialogImage::DrawImageArea( LPDRAWITEMSTRUCT lpDrawItem, const RECT* area )
 {
-	if (!render_area_refline_)
+	if (!area)
 	{
-		return;
+		area = &frame_res_->ScreenRect();
 	}
 
 	HGLOBAL obj_prev = SelectObject(lpDrawItem->hDC, pen_area_refline_);
 	//SetTextColor(lpDrawItem->hDC, 0x666600);
 
-	RECT frame_capture_rc = frame_capture_rc_;
+	RECT frame_capture_rc = *area;
 	OffsetRect(&frame_capture_rc, -ctl_pic_main_scroll_x_, -ctl_pic_main_scroll_y_);
 
 	if (frame_capture_rc.left > lpDrawItem->rcItem.left && frame_capture_rc.left < lpDrawItem->rcItem.right)
@@ -642,8 +670,8 @@ void CDialogImage::DrawTickBar( LPDRAWITEMSTRUCT lpDrawItem, HBITMAP bmp, int x,
 
 void CDialogImage::ClearFrameImageContent()
 {
-	HGLOBAL obj_prev = SelectObject(dc_memory_[0], frame_image_);
-	RECT rc = {0, 0, frame_image_width_, frame_image_height_};
+	HGLOBAL obj_prev = SelectObject(dc_memory_[0], composit_frame_image_);
+	RECT rc = {0, 0, composit_frame_image_width_, composit_frame_image_height_};
 	FillRect(dc_memory_[0], &rc, brush_background_transparent_);
 
 	SelectObject(dc_memory_[0], obj_prev);
@@ -661,24 +689,15 @@ void CDialogImage::ResetScrollRange()
 
 void CDialogImage::DrawImageRegion( LPDRAWITEMSTRUCT lpDrawItem )
 {
-	int region_sizes[] = {log_block_screen_data_->updated_rgn_data_len, log_block_screen_data_->visible_rgn_data_len, log_block_screen_data_->invisible_rgn_data_len, log_block_screen_data_->back_rgn_data_len };
-	LPRGNDATA region_datas[] = { log_block_screen_data_->get_updated_rgn_data(), log_block_screen_data_->get_visible_rgn_data(), log_block_screen_data_->get_invisible_rgn_data(), log_block_screen_data_->get_back_rgn_data() };
+	const HRGN* rgns = frame_res_->ScreenRegions();
 
 	for(int i = 0; i < ARRAYSIZE(region_show_flags_); ++i)
 	{
 		if (region_show_flags_[i])
 		{
-			if (NULL == region_handles_[i])
+			if (NULL != rgns[i])
 			{
-				if (region_sizes[i] > 0)
-				{
-					region_handles_[i] = ExtCreateRegion(NULL, region_sizes[i], region_datas[i]);
-				}
-			}
-
-			if (NULL != region_handles_[i])
-			{
-				DrawImageRegion(lpDrawItem, region_handles_[i], region_brushs_[i]);
+				DrawImageRegion(lpDrawItem, rgns[i], region_brushs_[i]);
 			}
 		}
 	}
@@ -753,42 +772,42 @@ void CDialogImage::OnPicMainLButtonUp( WPARAM wParam,LPARAM lParam )
 	::PostMessage(hwnd_main_, WM_SET_FOCUS_TO_SLIDER_FRAME, 0, 0);
 }
 
-void CDialogImage::ScrollToContent()
+void CDialogImage::ScrollViewToArea(const RECT& rc)
 {
-	if (frame_capture_rc_.left > ctl_pic_main_width_ + ctl_pic_main_scroll_x_)
+	if (rc.left > ctl_pic_main_width_ + ctl_pic_main_scroll_x_)
 	{
-		ctl_pic_main_scroll_x_ = frame_capture_rc_.right - ctl_pic_main_width_;
-		if (ctl_pic_main_scroll_x_ > frame_capture_rc_.left)
+		ctl_pic_main_scroll_x_ = rc.right - ctl_pic_main_width_;
+		if (ctl_pic_main_scroll_x_ > rc.left)
 		{
-			ctl_pic_main_scroll_x_ = frame_capture_rc_.left;
+			ctl_pic_main_scroll_x_ = rc.left;
 		}
 		ctl_scroll_h_.SetScrollPos(ctl_pic_main_scroll_x_);
 	}
-	else if (frame_capture_rc_.right < ctl_pic_main_scroll_x_)
+	else if (rc.right < ctl_pic_main_scroll_x_)
 	{
-		ctl_pic_main_scroll_x_ = frame_capture_rc_.left;
-		if (frame_capture_rc_.right > ctl_pic_main_scroll_x_ + ctl_pic_main_width_)
+		ctl_pic_main_scroll_x_ = rc.left;
+		if (rc.right > ctl_pic_main_scroll_x_ + ctl_pic_main_width_)
 		{
-			ctl_pic_main_scroll_x_ = frame_capture_rc_.right - ctl_pic_main_width_;
+			ctl_pic_main_scroll_x_ = rc.right - ctl_pic_main_width_;
 		}
 		ctl_scroll_h_.SetScrollPos(ctl_pic_main_scroll_x_);
 	}
 
-	if (frame_capture_rc_.top > ctl_pic_main_height_ + ctl_pic_main_scroll_y_)
+	if (rc.top > ctl_pic_main_height_ + ctl_pic_main_scroll_y_)
 	{
-		ctl_pic_main_scroll_y_ = frame_capture_rc_.bottom - ctl_pic_main_height_;
-		if (ctl_pic_main_scroll_y_ > frame_capture_rc_.top)
+		ctl_pic_main_scroll_y_ = rc.bottom - ctl_pic_main_height_;
+		if (ctl_pic_main_scroll_y_ > rc.top)
 		{
-			ctl_pic_main_scroll_y_ = frame_capture_rc_.top;
+			ctl_pic_main_scroll_y_ = rc.top;
 		}
 		ctl_scroll_v_.SetScrollPos(ctl_pic_main_scroll_y_);
 	}
-	else if (frame_capture_rc_.bottom < ctl_pic_main_scroll_y_)
+	else if (rc.bottom < ctl_pic_main_scroll_y_)
 	{
-		ctl_pic_main_scroll_y_ = frame_capture_rc_.top;
-		if (frame_capture_rc_.bottom > ctl_pic_main_scroll_y_ + ctl_pic_main_height_)
+		ctl_pic_main_scroll_y_ = rc.top;
+		if (rc.bottom > ctl_pic_main_scroll_y_ + ctl_pic_main_height_)
 		{
-			ctl_pic_main_scroll_y_ = frame_capture_rc_.bottom - ctl_pic_main_height_;
+			ctl_pic_main_scroll_y_ = rc.bottom - ctl_pic_main_height_;
 		}
 		ctl_scroll_v_.SetScrollPos(ctl_pic_main_scroll_y_);
 	}
@@ -806,11 +825,6 @@ LRESULT CDialogImage::OnMouseMove( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lPar
 		}
 	}
 	return 0;
-}
-
-void CDialogImage::OnMettingLoaded()
-{
-	current_frame_index_ = -1;
 }
 
 BOOL CDialogImage::PreTranslateMessage( MSG* pMsg )
@@ -847,34 +861,6 @@ BOOL CDialogImage::PreTranslateMessage( MSG* pMsg )
 	return FALSE;
 }
 
-void CDialogImage::InitImageBackgroundTransparent()
-{
-	HDC dc = GetDC();
-	image_background_transparent_ = CreateCompatibleBitmap(dc, 20, 20);
-	ReleaseDC(dc);
-
-	HGLOBAL obj_prev = SelectObject(dc_memory_[0], image_background_transparent_);
-	HBRUSH brush_white = CreateSolidBrush(0xFFFFFF);
-	HBRUSH brush_gray = CreateSolidBrush(0xDDDDDD);
-
-	for (int x = 0; x <= 2; ++x)
-	{
-		for (int y = 0; y < 2; ++y)
-		{
-			RECT rc = {x * 10, y * 10, 0, 0};
-			rc.right = rc.left + 10;
-			rc.bottom = rc.top + 10;
-
-			//DWORD color = ((x + y) % 2) ? COLOR_BTNHIGHLIGHT : COLOR_WINDOW;
-
-			FillRect(dc_memory_[0], &rc, ((x + y) % 2) ? brush_gray : brush_white );
-		}
-	}
-	SelectObject(dc_memory_[0], obj_prev);
-
-	brush_background_transparent_ = CreatePatternBrush(image_background_transparent_);
-}
-
 void CDialogImage::SetScale( bool v )
 {
 	if (render_show_scale_ != v)
@@ -888,6 +874,48 @@ void CDialogImage::SetMousePos( const POINT& pt )
 {
 	mouse_pos_.x = pt.x;
 	mouse_pos_.y = pt.y;
+}
+
+// void CDialogImage::SetASRecordPackage( IASRecordPackage* pkg )
+// {
+// 	record_package_ = pkg;
+// }
+
+HBRUSH CDialogImage::InitImageBackgroundBrush()
+{
+	HDC dc = ::GetDC(NULL);
+	HBITMAP image_background = ::CreateCompatibleBitmap(dc, 20, 20);
+	::ReleaseDC(NULL, dc);
+
+	HGLOBAL obj_prev = SelectObject(dc_memory_[0], image_background);
+	HBRUSH brush_white = CreateSolidBrush(0xFFFFFF);
+	HBRUSH brush_gray = CreateSolidBrush(0xDDDDDD);
+
+	for (int x = 0; x <= 2; ++x)
+	{
+		for (int y = 0; y < 2; ++y)
+		{
+			RECT rc = {x * 10, y * 10, 0, 0};
+			rc.right = rc.left + 10;
+			rc.bottom = rc.top + 10;
+
+			FillRect(dc_memory_[0], &rc, ((x + y) % 2) ? brush_gray : brush_white );
+		}
+	}
+	SelectObject(dc_memory_[0], obj_prev);
+
+	HBRUSH brush = CreatePatternBrush(image_background);
+
+	DeleteObject(brush_white);
+	DeleteObject(brush_gray);
+	DeleteObject(image_background);
+
+	return brush;
+}
+
+void CDialogImage::SetFrameRes( ASFrameRes* res )
+{
+	frame_res_ = res;
 }
 
 LRESULT CALLBACK WindowProc_PicMain( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )

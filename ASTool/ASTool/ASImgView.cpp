@@ -8,28 +8,29 @@
 #include "aboutdlg.h"
 #include "ASImgView.h"
 #include <math.h>
-//#include "cpt_util.h"
+#include "util/util.h"
+#include "asimg/ASRecordPackage_CptHost.h"
 
 enum { TIMER_ID_LOADFRAME = 1001, TIMER_ID_PLAY };
 
 WCHAR				img_log_dir_[MAX_PATH * 2] = TEXT("");
 WCHAR				img_log_file_path_[MAX_PATH * 2] = TEXT("");
-HANDLE				img_log_file_handle_ = INVALID_HANDLE_VALUE;
-LARGE_INTEGER		log_file_read_pointer_;
+//HANDLE				img_log_file_handle_ = INVALID_HANDLE_VALUE;
+//LARGE_INTEGER		log_file_read_pointer_;
 
-HICON				current_frame_cursor_image_ = NULL;
-POINT				current_frame_mouse_position_ = {0, 0};
+// HICON				current_frame_cursor_image_ = NULL;
+// POINT				current_frame_mouse_position_ = {0, 0};
 
-char*				log_block_buf_ = 0;
-int					log_block_buf_size_ = 0;
-cpt_common*			log_block_data_header_ = 0;
-cpt_screen_data*	log_block_screen_data_ = 0;
-int					log_block_frame_index_ = -1;
-
-__inline int align_data_32(int width, int bits)
-{
-	return ((width*bits)+31)/32*4;
-}
+// char*				log_block_buf_ = 0;
+// int					log_block_buf_size_ = 0;
+// cpt_common*			log_block_data_header_ = 0;
+// cpt_screen_data*	log_block_screen_data_ = 0;
+// int					log_block_frame_index_ = -1;
+// 
+// __inline int align_data_32(int width, int bits)
+// {
+// 	return ((width*bits)+31)/32*4;
+// }
 
 void make_export_file_path( int frame_index, TCHAR* buf)
 {
@@ -121,33 +122,6 @@ void save_to_bmp_file(WCHAR* file, BITMAPINFO* pbi, unsigned char* bits)
 	fclose(fh);
 }
 
-
-HBITMAP	LoadFrameImage(cpt_screen_data* data)
-{
-	BITMAPINFOHEADER bih = data->bi.bmiHeader;
-	HBITMAP hbp = CreateBitmap(bih.biWidth, bih.biHeight < 0 ? -bih.biHeight : bih.biHeight, bih.biPlanes, bih.biBitCount, data->get_image_bits());
-	return hbp;
-}
-
-time_duration time_duration::FromMiniseconds( LONGLONG miniseconds )
-{
-	LONGLONG seconds = miniseconds / 1000;
-	time_duration result = FromSeconds((LONG)seconds);
-	result.miniseconds = miniseconds % 1000;
-	return result;
-}
-
-time_duration time_duration::FromSeconds( LONG seconds )
-{
-	time_duration result;
-	result.miniseconds = 0;
-	result.seconds = seconds % 60;
-	LONG minutes = seconds / 60;
-	result.minute = minutes % 60;
-	result.hour = (unsigned short)(minutes / 60);
-	return result;
-}
-
 using namespace NSYedaoqLayout;
 
 BOOL CASImgView::PreTranslateMessage(MSG* pMsg)
@@ -177,7 +151,7 @@ LRESULT CASImgView::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	SetIcon(hIconSmall, FALSE);
 
 	HMODULE module_handle = GetModuleHandle(NULL);
-	icon_pause_ = (HICON)LoadImage(module_handle, MAKEINTRESOURCE(IDI_ASIMG_PLAY), IMAGE_ICON, 16, 16, LR_SHARED); // LoadIcon(module_handle, MAKEINTRESOURCE(IDI_PAUSE));
+	icon_pause_ = (HICON)LoadImage(module_handle, MAKEINTRESOURCE(IDI_ASIMG_PAUSE), IMAGE_ICON, 16, 16, LR_SHARED); // LoadIcon(module_handle, MAKEINTRESOURCE(IDI_PAUSE));
 	icon_play_ = (HICON)LoadImage(module_handle, MAKEINTRESOURCE(IDI_ASIMG_PLAY), IMAGE_ICON, 16, 16, LR_SHARED); // LoadIcon(module_handle, MAKEINTRESOURCE(IDI_PLAY));
 
 	// register object for message filtering and idle updates
@@ -189,8 +163,6 @@ LRESULT CASImgView::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	UIAddChildWindowContainer(m_hWnd);
 
 	DragAcceptFiles(TRUE);
-
-	img_frames_.reserve(10000);
 
 	dc_memory_ = CreateCompatibleDC(NULL);
 
@@ -220,11 +192,8 @@ LRESULT CASImgView::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 
 	ctl_tab_panels_.Attach(GetDlgItem(IDC_TAB_PANELS));
 
-	ctl_scroll_h_.Attach(GetDlgItem(IDC_SCROLL_H));
-	ctl_scroll_v_.Attach(GetDlgItem(IDC_SCROLL_V));
-
 	dlg_thumbs_.Create(ctl_tab_panels_);
-	dlg_thumbs_.PostMessage(WM_SET_THUMBS, 0, (LPARAM)nearby_frame_bitmaps_);
+	//dlg_thumbs_.PostMessage(WM_SET_THUMBS, 0, (LPARAM)nearby_frame_bitmaps_);
 
 	dlg_info_.Create(ctl_tab_panels_);
 	//dlg_record_.Create(ctl_tab_panels_);
@@ -274,8 +243,8 @@ LRESULT CASImgView::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	GetClientRect(&rc);
 	layout_main_.Layout(LayoutPoint::Zero, LayoutSize(rc.right, rc.bottom));
 
-	InitLogBlockBuffer();
-	InitMeetingList();
+	//InitLogBlockBuffer();
+	InitFileList();
 	InitTabPanels();
 
 	ctl_cmb_mettings_.SetWindowText(TEXT("select log file..."));
@@ -303,14 +272,14 @@ LRESULT CASImgView::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 	pLoop->RemoveMessageFilter(this);
 	pLoop->RemoveIdleHandler(this);
 
-	free(log_block_buf_);
-	log_block_buf_ = NULL;
-
-	if (INVALID_HANDLE_VALUE != img_log_file_handle_)
-	{
-		CloseHandle(img_log_file_handle_);
-		img_log_file_handle_ = INVALID_HANDLE_VALUE;
-	}
+// 	free(log_block_buf_);
+// 	log_block_buf_ = NULL;
+// 
+// 	if (INVALID_HANDLE_VALUE != img_log_file_handle_)
+// 	{
+// 		CloseHandle(img_log_file_handle_);
+// 		img_log_file_handle_ = INVALID_HANDLE_VALUE;
+// 	}
 	
 	if (NULL != dc_memory_)
 	{
@@ -403,25 +372,25 @@ void CASImgView::CloseDialog(int nVal)
 }
 
 CASImgView::CASImgView()
-	: layout_main_(NSYedaoqLayout::Direction_Vertical)
+	: layout_main_(NSYedaoqLayout::Direction_Vertical), record_package_(0)
 {
-	memset(nearby_frame_bitmaps_, 0, sizeof(nearby_frame_bitmaps_));
+	//memset(nearby_frame_bitmaps_, 0, sizeof(nearby_frame_bitmaps_));
 	play_flag_ = false;
 	play_thread_handle_ = INVALID_HANDLE_VALUE;
-	current_frame_cursor_image_pos_ = 0;
-	current_frame_cursor_image_ = 0;
+	//current_frame_cursor_image_pos_ = 0;
+	//current_frame_cursor_image_ = 0;
 
 	log_file_latest_cursorimage_pos_ = 0;
 	log_file_latest_mousepos_.x = 0;
 	log_file_latest_mousepos_.y = 0;
-
-	nearby_frame_index_base_ = -100;
+// 
+// 	nearby_frame_index_base_ = -100;
 }
 
-void CASImgView::InitMeetingList()
+void CASImgView::InitFileList()
 {
 	ctl_cmb_mettings_.SetCurSel(-1);
-	ctl_cmb_mettings_.Clear();
+	ctl_cmb_mettings_.ResetContent();
 
 	WCHAR path_buf[MAX_PATH];
 	SHGetSpecialFolderPath(NULL, path_buf, CSIDL_APPDATA, FALSE);
@@ -459,8 +428,8 @@ LRESULT CASImgView::OnCmbMettingSelChanged(WORD /*wNotifyCode*/, WORD wID, HWND 
 
 	::PathCombine(img_log_file_path_, img_log_dir_, path_buf);
 
-	CloseImgLogFile();
-	LoadImgLogFile(img_log_file_path_);
+	CloseASRecording();
+	LoadASRecording(img_log_file_path_);
 
 	ctl_slider_frame_.SetFocus();
 
@@ -480,129 +449,56 @@ LRESULT CASImgView::OnCmbPlayrateSelChanged( WORD /*wNotifyCode*/, WORD wID, HWN
 	return 0;
 }
 
-bool CASImgView::LoadImgLogFile( LPCTSTR file_path )
+bool CASImgView::LoadASRecording( LPCTSTR file_path )
 {
-	if (INVALID_HANDLE_VALUE != img_log_file_handle_)
+	CloseASRecording();
+
+	record_package_ = new ASRecordFrameData_CptHost();
+	if (!record_package_->LoadFrom(file_path))
 	{
-		CloseImgLogFile();
-	}
-
-	bool alive_metting_log_flag = false;
-	img_log_file_handle_ = CreateFile(file_path, FILE_READ_DATA, 0, NULL, OPEN_ALWAYS, NULL, NULL);
-	if (INVALID_HANDLE_VALUE == img_log_file_handle_)
-	{
-		alive_metting_log_flag = true;
-		img_log_file_handle_ = CreateFile(file_path, FILE_READ_DATA, FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, NULL, NULL);
-	}
-
-	log_file_read_pointer_.QuadPart = 0;
-	current_frame_index_ = -1;
-	img_frames_.clear();
-
-	ctl_txt_curtime_.SetWindowText(TEXT("00:00:00:0000"));
-	ctl_slider_frame_.SetScrollRange(SB_CTL, 0, img_frames_.size() - 1, FALSE);
-	ctl_slider_timeline_.SetPos(0);
-
-	if (!LoadImgLogContent())
-	{
+		ctl_status_bar_.SetTipText(0, TEXT("无法打开录像文件！"));
 		return false;
 	}
-
-	if (alive_metting_log_flag)
+	else
 	{
-		SetTimer(TIMER_ID_LOADFRAME, 500, NULL);
+		ctl_status_bar_.SetTipText(0, TEXT("打开录像文件成功"));
 	}
 
-	dlg_image_.OnMettingLoaded();
+	current_frame_res_.SetRecordPackage(record_package_);
+
+	ctl_txt_curtime_.SetWindowText(TEXT("00:00:00:0000"));
+	ctl_slider_frame_.SetScrollRange(SB_CTL, 0, record_package_->GetFrameCount() - 1, FALSE);
+	ctl_slider_timeline_.SetPos(0);
+
+	dlg_image_.SetFrameRes(&current_frame_res_);
+	//dlg_image_.SetASRecordPackage(record_package_);
+	UpdateTimeLine();
 	SetCurrentFrame(0, true);
 
 	return true;
 }
 
-void CASImgView::CloseImgLogFile()
+void CASImgView::CloseASRecording()
 {
 	KillTimer(TIMER_ID_LOADFRAME);
-
-	if (INVALID_HANDLE_VALUE != img_log_file_handle_)
+	if (record_package_)
 	{
-		CloseHandle(img_log_file_handle_);
-		img_log_file_handle_ = INVALID_HANDLE_VALUE;
-
-		log_block_frame_index_ = -1;
+		delete record_package_;
+		record_package_ = 0;
 	}
-}
-
-bool CASImgView::LoadImgLogContent()
-{
-	img_frame_info info;
-	file_frame_header header;
-
-	SetFilePointerEx(img_log_file_handle_, log_file_read_pointer_, NULL, FILE_BEGIN);
-
-	DWORD	byte_readed = 0;
-	while(true)
-	{
-		ReadFile(img_log_file_handle_, &header, sizeof(header), &byte_readed, NULL);
-		if (byte_readed < sizeof(header)/* || header.common.size > 100000000*/)
-		{
-			break;
-		}
-
-		switch(header.common.data_type)
-		{
-		case cpt_dt_display_device:
-			break;
-		case cpt_dt_screen_capture:
-			info.frame_data_pos.QuadPart = log_file_read_pointer_.QuadPart + sizeof(FILETIME);
-			info.frame_time = header.frame_time;
-			info.cursur_image_pos.QuadPart = log_file_latest_cursorimage_pos_;
-			info.mouse_pos = log_file_latest_mousepos_;
-			img_frames_.push_back(info);
-			break;
-		case cpt_dt_mouse_pointer:
-			log_file_latest_cursorimage_pos_ = log_file_read_pointer_.QuadPart + sizeof(FILETIME);
-			break;
-		case cpt_dt_mouse_pos:
-			log_file_latest_mousepos_ = ReadMousePos(log_file_read_pointer_.QuadPart + sizeof(FILETIME));
-			break;
-		default:
-			int x= 0;
-			break;
-		}
-
-		LONG block_size = header.common.size + sizeof(FILETIME);
-		log_file_read_pointer_.QuadPart += block_size;
-
-		if (!SetFilePointerEx(img_log_file_handle_, log_file_read_pointer_, NULL, FILE_BEGIN))
-		{
-			log_file_read_pointer_.QuadPart -= block_size;
-			break;
-		}
-	}
-
-	if (img_frames_.size() <= 0)
-	{
-		return false;
-	}
-
-	UpdateTimeLine();
-	return true;
 }
 
 bool CASImgView::UpdateTimeLine()
 {
-	if(img_frames_.size() < 0)
+	if(!record_package_)
 		return false;
 
-	metting_duration_miniseconds_ = (((LARGE_INTEGER&)img_frames_.rbegin()->frame_time).QuadPart - ((LARGE_INTEGER&)img_frames_.begin()->frame_time).QuadPart) / 10000;
+	metting_duration_miniseconds_ = record_package_->GetRecordDurationMiniseconds();
 	metting_duration_ = time_duration::FromMiniseconds(metting_duration_miniseconds_);
 
 	TCHAR buf[128];
 	_stprintf_s(buf, ARRAYSIZE(buf), TEXT("/ %02d:%02d:%02d"), (int)metting_duration_.hour, (int)metting_duration_.minute, (int)metting_duration_.seconds);
 	ctl_txt_time_.SetWindowText(buf);
-
-	int range_lowbound, range_upperbound;
-	ctl_slider_timeline_.GetRange(range_lowbound, range_upperbound);
 
 	ctl_slider_timeline_.SetRange(0, (DWORD)(metting_duration_miniseconds_ / 1000));
 	ctl_slider_timeline_.SetPageSize(15);
@@ -613,47 +509,21 @@ bool CASImgView::UpdateTimeLine()
 
 	ctl_slider_timeline_.GetToolTips();
 
-	_stprintf_s(buf, ARRAYSIZE(buf), TEXT("/ %06d"), img_frames_.size());
+	_stprintf_s(buf, ARRAYSIZE(buf), TEXT("/ %06d"), record_package_->GetFrameCount());
 	ctl_txt_frames_.SetWindowText(buf);
 	ctl_txt_curframe_.SetWindowText(TEXT("000000"));
 
-	ctl_slider_frame_.SetRange(0, img_frames_.size() - 1);
+	ctl_slider_frame_.SetRange(0, record_package_->GetFrameCount() - 1);
 	ctl_slider_frame_.SetLineSize(1);
 	ctl_slider_frame_.SetPageSize(50);
 
 	return true;
 }
 
-int CASImgView::GetImageFrameIndexOfSliderPos( int pos )
-{
-	__int64 frame_time = img_frames_.begin()->frmae_time_i64 + pos * 10000 * 1000;
-
-	unsigned int index = (unsigned int)((__int64)img_frames_.size() * (pos * 1000) / metting_duration_miniseconds_);
-	if (index >= img_frames_.size())
-	{
-		index = img_frames_.size() - 1;
-	}
-
-	if (img_frames_[index].frmae_time_i64 > frame_time)
-	{
-		while(img_frames_[index].frmae_time_i64 > frame_time && index >= 0)
-		{
-			--index;
-		}
-	}
-	else
-	{
-		for (++index; img_frames_[index].frmae_time_i64 <= frame_time && index < img_frames_.size(); ++index);
-		--index;
-	}
-
-	return (int)index;
-}
-
 LRESULT CASImgView::OnHScroll( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& bHandled )
 {
 	bHandled = TRUE;
-	if (INVALID_HANDLE_VALUE == img_log_file_handle_)
+	if (!record_package_)
 	{
 		return 0;
 	}
@@ -665,7 +535,7 @@ LRESULT CASImgView::OnHScroll( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL
 	}
 	else if ((HWND)lParam == (HWND)ctl_slider_timeline_)
 	{
-		int frame_index = GetImageFrameIndexOfSliderPos(ctl_slider_timeline_.GetPos());
+		int frame_index = record_package_->GetFrameOfTime(ctl_slider_timeline_.GetPos());
 		SetCurrentFrame(frame_index, true);
 	}
 // 	else if((HWND)lParam == ctl_scroll_h_)
@@ -725,21 +595,18 @@ LRESULT CASImgView::OnDrawItem( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 
 void CASImgView::SetCurrentFrame( int frame_index, bool refresh_panel )
 {
-	if (frame_index < 0 || (unsigned int)frame_index >= img_frames_.size() || frame_index == current_frame_index_)
+	if (current_frame_res_.GetFrameIndex() == frame_index)
 	{
+		ctl_status_bar_.SetTipText(1, TEXT("帧索引未变化！"));
 		return;
 	}
-
+	 
+	current_frame_res_.UpdateForFrame(frame_index);
 	current_frame_index_ = frame_index;
-	log_block_frame_index_ = frame_index;
+
 	ctl_slider_frame_.SetPos(frame_index);
 
-	if (refresh_panel)
-	{
-		BuildNearbyImages(current_frame_index_ - 3);
-	}
-
-	time_duration frame_time = time_duration::FromMiniseconds((img_frames_[frame_index].frmae_time_i64 - img_frames_.begin()->frmae_time_i64) / 10000);
+	time_duration frame_time = time_duration::FromMiniseconds(current_frame_res_.FrameTime());
 	
 	TCHAR buf[128];
 	_stprintf_s(buf, ARRAYSIZE(buf), TEXT("%02d:%02d:%02d:%04d"), (int)frame_time.hour, (int)frame_time.minute, (int)frame_time.seconds, (int)frame_time.miniseconds);
@@ -748,9 +615,10 @@ void CASImgView::SetCurrentFrame( int frame_index, bool refresh_panel )
 	_stprintf_s(buf, ARRAYSIZE(buf), TEXT("%06d"), frame_index);
 	ctl_txt_curframe_.SetWindowText(buf);
 
-	if ((unsigned int)frame_index < img_frames_.size() - 1)
+	if (frame_index < record_package_->GetFrameCount() - 1)
 	{
-		time_duration continue_time = time_duration::FromMiniseconds((img_frames_[frame_index + 1].frmae_time_i64 - img_frames_[frame_index].frmae_time_i64) / 10000);
+		__int64 next_frame_time = record_package_->GetFrameTime(frame_index + 1);
+		time_duration continue_time = time_duration::FromMiniseconds(next_frame_time - current_frame_res_.FrameTime());
 		_stprintf_s(buf, ARRAYSIZE(buf), TEXT("%02d:%02d:%04d"), (int)continue_time.minute, (int)continue_time.seconds, (int)continue_time.miniseconds);
 		ctl_txt_frame_continue_.SetWindowText(buf);
 	}
@@ -758,43 +626,36 @@ void CASImgView::SetCurrentFrame( int frame_index, bool refresh_panel )
 	{
 		ctl_txt_frame_continue_.SetWindowText(TEXT("00:00:0000"));
 	}
-
-	// 加载鼠标数据
-	current_frame_mouse_position_ = img_frames_[frame_index].mouse_pos;
-	if (current_frame_cursor_image_pos_ != img_frames_[frame_index].cursur_image_pos.QuadPart)
-	{
-		ReadCursorImage(img_frames_[frame_index].cursur_image_pos.QuadPart);
-	}
 	
 	// 重新加载当前帧
-	if (!LoadFrameData(frame_index))
-	{
-		MessageBox(TEXT("无法获取此帧数据！"), TEXT("提示"), MB_OK);
-		return;
-	}
+// 	if (!LoadFrameData(frame_index))
+// 	{
+// 		MessageBox(TEXT("无法获取此帧数据！"), TEXT("提示"), MB_OK);
+// 		return;
+// 	}
 	
-	if (refresh_panel)
-	{
-		BOOL tmp;
-		OnTabPanelSwitched(0, 0, tmp);
-	}
+// 	if (refresh_panel)
+// 	{
+// 		BOOL tmp;
+// 		OnTabPanelSwitched(0, 0, tmp);
+// 	}
 
 	//dlg_image_.SetMousePos(&img_frames_[frame_index].mouse_pos);
 	dlg_image_.Refresh();
 }
 
-HBITMAP CASImgView::LoadFrameImage( int frame_index )
-{
-	if (LoadFrameData(frame_index))
-	{
-		cpt_screen_data* screen_data = (cpt_screen_data*)log_block_buf_;
-		BITMAPINFOHEADER bih = screen_data->bi.bmiHeader;
-		HBITMAP hbp = CreateBitmap(bih.biWidth, bih.biHeight < 0 ? -bih.biHeight : bih.biHeight, bih.biPlanes, bih.biBitCount, screen_data->get_image_bits());
-		return hbp;
-	}
-
-	return NULL;
-}
+// HBITMAP CASImgView::LoadFrameImage( int frame_index )
+// {
+// 	if (LoadFrameData(frame_index))
+// 	{
+// 		cpt_screen_data* screen_data = (cpt_screen_data*)log_block_buf_;
+// 		BITMAPINFOHEADER bih = screen_data->bi.bmiHeader;
+// 		HBITMAP hbp = CreateBitmap(bih.biWidth, bih.biHeight < 0 ? -bih.biHeight : bih.biHeight, bih.biPlanes, bih.biBitCount, screen_data->get_image_bits());
+// 		return hbp;
+// 	}
+// 
+// 	return NULL;
+// }
 
 void CASImgView::DisplayImageInStatic( HBITMAP hbp, DWORD ctl_id )
 {
@@ -842,31 +703,31 @@ void CASImgView::DisplayImageInStatic( HBITMAP hbp, DWORD ctl_id )
 // 	SelectObject(prev_obj);
 // }
 
-bool CASImgView::LoadFrameData( int frame_index )
-{
-	LARGE_INTEGER frame_pos = img_frames_[frame_index].frame_data_pos;
-
-	SetFilePointerEx(img_log_file_handle_, frame_pos, NULL, FILE_BEGIN);
-
-	DWORD bytes_readed = 0;
-	ReadFile(img_log_file_handle_, log_block_buf_, sizeof(cpt_common), &bytes_readed, NULL);
-	if (bytes_readed < sizeof(cpt_common))
-	{
-		return false;
-	}
-
-	if (cpt_dt_screen_capture == log_block_data_header_->data_type)
-	{
-		SetFilePointerEx(img_log_file_handle_, frame_pos, NULL, FILE_BEGIN);
-		ReadFile(img_log_file_handle_, log_block_buf_, log_block_data_header_->size, &bytes_readed, NULL);
-		if (bytes_readed < log_block_data_header_->size)
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
+// bool CASImgView::LoadFrameData( int frame_index )
+// {
+// 	LARGE_INTEGER frame_pos = img_frames_[frame_index].frame_data_pos;
+// 
+// 	SetFilePointerEx(img_log_file_handle_, frame_pos, NULL, FILE_BEGIN);
+// 
+// 	DWORD bytes_readed = 0;
+// 	ReadFile(img_log_file_handle_, log_block_buf_, sizeof(cpt_common), &bytes_readed, NULL);
+// 	if (bytes_readed < sizeof(cpt_common))
+// 	{
+// 		return false;
+// 	}
+// 
+// 	if (cpt_dt_screen_capture == log_block_data_header_->data_type)
+// 	{
+// 		SetFilePointerEx(img_log_file_handle_, frame_pos, NULL, FILE_BEGIN);
+// 		ReadFile(img_log_file_handle_, log_block_buf_, log_block_data_header_->size, &bytes_readed, NULL);
+// 		if (bytes_readed < log_block_data_header_->size)
+// 		{
+// 			return false;
+// 		}
+// 	}
+// 
+// 	return true;
+// }
 
 LRESULT CASImgView::OnBtnRegion( WORD /*wNotifyCode*/, WORD wID, HWND hWndCtl, BOOL& bHandled )
 {
@@ -940,51 +801,52 @@ LRESULT CASImgView::OnBtnPlay( WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/,
 	return 0;
 }
 
-void CASImgView::BuildNearbyImages( int first_frame_index )
-{
-	int prev_nearby_frame_base_index = nearby_frame_index_base_;
-	HBITMAP	prev_nearby_bitmaps[7];
-	memcpy(prev_nearby_bitmaps, nearby_frame_bitmaps_, sizeof(prev_nearby_bitmaps));
-
-	nearby_frame_index_base_ = first_frame_index;
-
-	int reload_range_lbound = 0;
-	int reload_range_ubound = ARRAYSIZE(nearby_frame_bitmaps_);
-
-	for (int idx = 0; idx < ARRAYSIZE(prev_nearby_bitmaps); ++idx)
-	{
-		int nearby_frame_index = nearby_frame_index_base_ + idx;
-		if (nearby_frame_index >= 0 && (unsigned int)nearby_frame_index < img_frames_.size())
-		{
-			if(nearby_frame_index >= prev_nearby_frame_base_index && nearby_frame_index < (prev_nearby_frame_base_index + 7/* ARRAYSIZE(prev_nearby_bitmaps)*/) 
-				&& NULL != prev_nearby_bitmaps[nearby_frame_index - prev_nearby_frame_base_index])
-			{
-				nearby_frame_bitmaps_[idx] = prev_nearby_bitmaps[nearby_frame_index - prev_nearby_frame_base_index];
-				prev_nearby_bitmaps[nearby_frame_index - prev_nearby_frame_base_index] = NULL;
-			}
-			else
-			{
-				nearby_frame_bitmaps_[idx] = LoadFrameImage(nearby_frame_index);
-			}
-		}
-		else
-		{
-			nearby_frame_bitmaps_[idx] = NULL;
-		}
-	}
-
-	for (int i = 0; i < ARRAYSIZE(prev_nearby_bitmaps); ++i)
-	{
-		if (NULL != prev_nearby_bitmaps[i])
-		{
-			DeleteObject(prev_nearby_bitmaps[i]);
-		}
-	}
-}
+// void CASImgView::BuildNearbyImages( int first_frame_index )
+// {
+	//throw 1;
+// 	int prev_nearby_frame_base_index = nearby_frame_index_base_;
+// 	HBITMAP	prev_nearby_bitmaps[7];
+// 	memcpy(prev_nearby_bitmaps, nearby_frame_bitmaps_, sizeof(prev_nearby_bitmaps));
+// 
+// 	nearby_frame_index_base_ = first_frame_index;
+// 
+// 	int reload_range_lbound = 0;
+// 	int reload_range_ubound = ARRAYSIZE(nearby_frame_bitmaps_);
+// 
+// 	for (int idx = 0; idx < ARRAYSIZE(prev_nearby_bitmaps); ++idx)
+// 	{
+// 		int nearby_frame_index = nearby_frame_index_base_ + idx;
+// 		if (nearby_frame_index >= 0 && (unsigned int)nearby_frame_index < img_frames_.size())
+// 		{
+// 			if(nearby_frame_index >= prev_nearby_frame_base_index && nearby_frame_index < (prev_nearby_frame_base_index + 7/* ARRAYSIZE(prev_nearby_bitmaps)*/) 
+// 				&& NULL != prev_nearby_bitmaps[nearby_frame_index - prev_nearby_frame_base_index])
+// 			{
+// 				nearby_frame_bitmaps_[idx] = prev_nearby_bitmaps[nearby_frame_index - prev_nearby_frame_base_index];
+// 				prev_nearby_bitmaps[nearby_frame_index - prev_nearby_frame_base_index] = NULL;
+// 			}
+// 			else
+// 			{
+// 				nearby_frame_bitmaps_[idx] = LoadFrameImage(nearby_frame_index);
+// 			}
+// 		}
+// 		else
+// 		{
+// 			nearby_frame_bitmaps_[idx] = NULL;
+// 		}
+// 	}
+// 
+// 	for (int i = 0; i < ARRAYSIZE(prev_nearby_bitmaps); ++i)
+// 	{
+// 		if (NULL != prev_nearby_bitmaps[i])
+// 		{
+// 			DeleteObject(prev_nearby_bitmaps[i]);
+// 		}
+// 	}
+//}
 
 void CASImgView::StartPlay()
 {
-	if (INVALID_HANDLE_VALUE != img_log_file_handle_)
+	if (record_package_)
 	{
 		play_flag_ = true;
 		
@@ -1019,26 +881,10 @@ void CASImgView::LoopPlay()
 	{
 		while(!play_flag_) Sleep(200);
 
-// 		LARGE_INTEGER counter_begin;
-// 		LARGE_INTEGER counter_now;
-// 		QueryPerformanceCounter(&counter_begin);
-// 
-// 		__int64 filetime_first_frame = img_frames_.begin()->frmae_time_i64;
-
 		play_target_frame_index_ = current_frame_index_;
-		while (play_flag_ && (unsigned int)play_target_frame_index_ < img_frames_.size() - 1)
+		while (play_flag_ && (unsigned int)play_target_frame_index_ < record_package_->GetFrameCount() - 1)
 		{
-// 			__int64 filetime_next_frame = img_frames_[play_target_frame_index_ + 1].frmae_time_i64;
-// 			__int64 frame_duration_miniseconds = (filetime_next_frame - filetime_first_frame) / 10000;
-// 			
-// 			QueryPerformanceCounter(&counter_now);
-// 			__int64 sleep_miniseconds = frame_duration_miniseconds - (counter_now.QuadPart - counter_begin.QuadPart) * 1000 / counter_frequency.QuadPart;
-// 			if (sleep_miniseconds > 2)
-// 			{
-// 				Sleep(sleep_miniseconds);
-// 			}
-
-			__int64 filetime_duration = (img_frames_[play_target_frame_index_ + 1].frmae_time_i64 - img_frames_[play_target_frame_index_].frmae_time_i64) / 10000;
+			__int64 filetime_duration = record_package_->GetFrameTime(play_target_frame_index_ + 1) - record_package_->GetFrameTime(play_target_frame_index_);
 			Sleep((DWORD)filetime_duration);
 
 			++play_target_frame_index_;
@@ -1110,9 +956,9 @@ LRESULT CASImgView::OnTabPanelSwitched( int wParam, LPNMHDR lpnh, BOOL& bHandled
 		::ShowWindow(panels[i], (cur_sel == i) ? SW_SHOWNORMAL : SW_HIDE);
 	}
 
-	if (INVALID_HANDLE_VALUE != img_log_file_handle_)
+	if (record_package_)
 	{
-		::PostMessage(panels[cur_sel], WM_REFRESH_PANEL, 0, (LPARAM)log_block_data_header_);
+		::PostMessage(panels[cur_sel], WM_REFRESH_PANEL, 0, 0);
 	}
 	
 	ctl_slider_frame_.SetFocus();
@@ -1147,20 +993,13 @@ LRESULT CASImgView::OnTabPanelSwitched( int wParam, LPNMHDR lpnh, BOOL& bHandled
 // 	}
 // }
 
-void CASImgView::InitLogBlockBuffer()
-{
-	log_block_buf_size_ = sizeof(cpt_screen_data) + 3 * (sizeof(RGNDATA) + 4096) + 4096 * 2160 * 4 + 1000;
-	log_block_buf_ = (char*)malloc(log_block_buf_size_);
-	log_block_data_header_ = (cpt_common*)log_block_buf_;
-	log_block_screen_data_ = (cpt_screen_data*)log_block_buf_;
-}
-
 LRESULT CASImgView::OnBtnExportFrame( WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled )
 {
 	bHandled = TRUE;
 	TCHAR buf[MAX_PATH * 2];
 	make_export_file_path(current_frame_index_, buf);
-	save_to_bmp_file(buf, &log_block_screen_data_->bi, log_block_screen_data_->get_image_bits());
+	throw 1;
+	//save_to_bmp_file(buf, &log_block_screen_data_->bi, log_block_screen_data_->get_image_bits());
 	ctl_slider_frame_.SetFocus();
 	return 0;
 	
@@ -1211,103 +1050,103 @@ LRESULT CASImgView::OnBtnScale( WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/
 	return 0;
 }
 
-POINT CASImgView::ReadMousePos(LONGLONG file_pos )
-{	
-	cpt_mouse_position_data* data = (cpt_mouse_position_data*)log_block_buf_;
-	DWORD bytes_readed = 0;
-	POINT pt = {0, 0};
-	SetFilePointerEx(img_log_file_handle_, (LARGE_INTEGER&)file_pos, NULL, FILE_BEGIN);
+// POINT CASImgView::ReadMousePos(LONGLONG file_pos )
+// {	
+// 	cpt_mouse_position_data* data = (cpt_mouse_position_data*)log_block_buf_;
+// 	DWORD bytes_readed = 0;
+// 	POINT pt = {0, 0};
+// 	SetFilePointerEx(img_log_file_handle_, (LARGE_INTEGER&)file_pos, NULL, FILE_BEGIN);
+// 
+// 	ReadFile(img_log_file_handle_, log_block_buf_, sizeof(cpt_mouse_position_data), &bytes_readed, NULL);
+// 	if (bytes_readed >= sizeof(cpt_mouse_position_data))
+// 	{
+// 		pt = data->pos;
+// 	}
+// 
+// 	return pt;
+// }
 
-	ReadFile(img_log_file_handle_, log_block_buf_, sizeof(cpt_mouse_position_data), &bytes_readed, NULL);
-	if (bytes_readed >= sizeof(cpt_mouse_position_data))
-	{
-		pt = data->pos;
-	}
-
-	return pt;
-}
-
-void CASImgView::ReadCursorImage( LONGLONG file_pos )
-{
-	if(current_frame_cursor_image_) DestroyIcon(current_frame_cursor_image_);
-	current_frame_cursor_image_ = NULL;
-
-	if (0 == file_pos)
-	{
-		return;
-	}
-
-	cpt_mouse_pointer_data* data = (cpt_mouse_pointer_data*)log_block_buf_;
-	SetFilePointerEx(img_log_file_handle_, (LARGE_INTEGER&)file_pos, NULL, FILE_BEGIN);
-
-	DWORD bytes_readed = 0;
-	ReadFile(img_log_file_handle_, log_block_buf_, sizeof(cpt_common), &bytes_readed, NULL);
-	if (bytes_readed < sizeof(cpt_common))
-	{
-		return;
-	}
-
-	bytes_readed = 0;
-	ReadFile(img_log_file_handle_, log_block_buf_ + sizeof(cpt_common), log_block_data_header_->size - sizeof(cpt_common), &bytes_readed, NULL);
-	if (bytes_readed < log_block_data_header_->size - sizeof(cpt_common))
-	{
-		return;
-	}
-
-	LPBYTE color_bits = data->pointer_bits + align_data_32(data->pointer_shape.cx, 1)*data->pointer_shape.cy;
-
-	if(data->pointer_shape.BitsPixel == 32)
-	{
-		HBITMAP bmp_mask = CreateBitmap(data->pointer_shape.cx, data->pointer_shape.cy, 1, 1, data->pointer_bits);
-
-		HDC hdc = ::GetDC(NULL);
-
-		BYTE bis[256];
-		BITMAPV5HEADER& bi = *(BITMAPV5HEADER*)bis;
-
-		ZeroMemory(&bi,sizeof(BITMAPV5HEADER));
-		bi.bV5Size           = sizeof(BITMAPV5HEADER);
-		bi.bV5Width           = data->pointer_shape.cx;
-		bi.bV5Height          = -data->pointer_shape.cy;
-		bi.bV5Planes = 1;
-		bi.bV5BitCount = 32;
-		bi.bV5Compression = BI_BITFIELDS;
-		bi.bV5RedMask   =  0x00FF0000;
-		bi.bV5GreenMask =  0x0000FF00;
-		bi.bV5BlueMask  =  0x000000FF;
-		bi.bV5AlphaMask =  0xFF000000; 
-		bi.bV5SizeImage = data->pointer_shape.cbWidth * data->pointer_shape.cy;
-
-		LPBYTE bmp_bits;
-		HBITMAP bmp_cursor = CreateDIBSection(hdc, (BITMAPINFO*)&bi, DIB_RGB_COLORS, (LPVOID*)&bmp_bits, NULL, 0);
-		memcpy(bmp_bits, color_bits, data->pointer_shape.cbWidth * data->pointer_shape.cy);
-	/*
-			LPDWORD lpbits = (LPDWORD)bmp_bits;
-			for(int i = 0; i< cs.cx*cs.cy; i++)
-		{
-				if((lpbits[i]&0xFF000000)== 0xFF000000)
-					lpbits[i] &= 0x6fffffff;
-		}
-	*/
-		::ReleaseDC(NULL, hdc);
-
-		ICONINFO icn_info;
-		icn_info.fIcon = FALSE;
-		icn_info.xHotspot = data->pointer_shape.xHotSpot;
-		icn_info.yHotspot = data->pointer_shape.yHotSpot;
-		icn_info.hbmMask = bmp_mask;
-		icn_info.hbmColor = bmp_cursor;
-
-		current_frame_cursor_image_ = CreateIconIndirect(&icn_info);
-
-		DeleteObject(bmp_mask);
-		DeleteObject(bmp_cursor);
-	}
-	else
-	{
-		current_frame_cursor_image_ = CreateIcon(GetModuleHandle(NULL), data->pointer_shape.cx, data->pointer_shape.cy, data->pointer_shape.Planes, data->pointer_shape.BitsPixel,  data->pointer_bits, color_bits);
-	}
-}
+// void CASImgView::ReadCursorImage( LONGLONG file_pos )
+// {
+// 	if(current_frame_cursor_image_) DestroyIcon(current_frame_cursor_image_);
+// 	current_frame_cursor_image_ = NULL;
+// 
+// 	if (0 == file_pos)
+// 	{
+// 		return;
+// 	}
+// 
+// 	cpt_mouse_pointer_data* data = (cpt_mouse_pointer_data*)log_block_buf_;
+// 	SetFilePointerEx(img_log_file_handle_, (LARGE_INTEGER&)file_pos, NULL, FILE_BEGIN);
+// 
+// 	DWORD bytes_readed = 0;
+// 	ReadFile(img_log_file_handle_, log_block_buf_, sizeof(cpt_common), &bytes_readed, NULL);
+// 	if (bytes_readed < sizeof(cpt_common))
+// 	{
+// 		return;
+// 	}
+// 
+// 	bytes_readed = 0;
+// 	ReadFile(img_log_file_handle_, log_block_buf_ + sizeof(cpt_common), log_block_data_header_->size - sizeof(cpt_common), &bytes_readed, NULL);
+// 	if (bytes_readed < log_block_data_header_->size - sizeof(cpt_common))
+// 	{
+// 		return;
+// 	}
+// 
+// 	LPBYTE color_bits = data->pointer_bits + align_data_32(data->pointer_shape.cx, 1)*data->pointer_shape.cy;
+// 
+// 	if(data->pointer_shape.BitsPixel == 32)
+// 	{
+// 		HBITMAP bmp_mask = CreateBitmap(data->pointer_shape.cx, data->pointer_shape.cy, 1, 1, data->pointer_bits);
+// 
+// 		HDC hdc = ::GetDC(NULL);
+// 
+// 		BYTE bis[256];
+// 		BITMAPV5HEADER& bi = *(BITMAPV5HEADER*)bis;
+// 
+// 		ZeroMemory(&bi,sizeof(BITMAPV5HEADER));
+// 		bi.bV5Size           = sizeof(BITMAPV5HEADER);
+// 		bi.bV5Width           = data->pointer_shape.cx;
+// 		bi.bV5Height          = -data->pointer_shape.cy;
+// 		bi.bV5Planes = 1;
+// 		bi.bV5BitCount = 32;
+// 		bi.bV5Compression = BI_BITFIELDS;
+// 		bi.bV5RedMask   =  0x00FF0000;
+// 		bi.bV5GreenMask =  0x0000FF00;
+// 		bi.bV5BlueMask  =  0x000000FF;
+// 		bi.bV5AlphaMask =  0xFF000000; 
+// 		bi.bV5SizeImage = data->pointer_shape.cbWidth * data->pointer_shape.cy;
+// 
+// 		LPBYTE bmp_bits;
+// 		HBITMAP bmp_cursor = CreateDIBSection(hdc, (BITMAPINFO*)&bi, DIB_RGB_COLORS, (LPVOID*)&bmp_bits, NULL, 0);
+// 		memcpy(bmp_bits, color_bits, data->pointer_shape.cbWidth * data->pointer_shape.cy);
+// 	/*
+// 			LPDWORD lpbits = (LPDWORD)bmp_bits;
+// 			for(int i = 0; i< cs.cx*cs.cy; i++)
+// 		{
+// 				if((lpbits[i]&0xFF000000)== 0xFF000000)
+// 					lpbits[i] &= 0x6fffffff;
+// 		}
+// 	*/
+// 		::ReleaseDC(NULL, hdc);
+// 
+// 		ICONINFO icn_info;
+// 		icn_info.fIcon = FALSE;
+// 		icn_info.xHotspot = data->pointer_shape.xHotSpot;
+// 		icn_info.yHotspot = data->pointer_shape.yHotSpot;
+// 		icn_info.hbmMask = bmp_mask;
+// 		icn_info.hbmColor = bmp_cursor;
+// 
+// 		current_frame_cursor_image_ = CreateIconIndirect(&icn_info);
+// 
+// 		DeleteObject(bmp_mask);
+// 		DeleteObject(bmp_cursor);
+// 	}
+// 	else
+// 	{
+// 		current_frame_cursor_image_ = CreateIcon(GetModuleHandle(NULL), data->pointer_shape.cx, data->pointer_shape.cy, data->pointer_shape.Planes, data->pointer_shape.BitsPixel,  data->pointer_bits, color_bits);
+// 	}
+// }
 
 LRESULT CASImgView::OnPlaySwitch( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled )
 {
@@ -1319,14 +1158,21 @@ LRESULT CASImgView::OnDropFiles( UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/
 {
 	bHandled = TRUE;
 	TCHAR file_path[MAX_PATH * 2];
-	if(DragQueryFile((HDROP)wParam, 0, file_path, ARRAYSIZE(file_path)) <= 0)
-		return 0;
-	
-	CloseImgLogFile();
-	if(LoadImgLogFile(file_path))
-		_tcscpy(img_log_file_path_, file_path);
+	if(DragQueryFile((HDROP)wParam, 0, file_path, ARRAYSIZE(file_path)) > 0)
+	{
+		CloseASRecording();
+		if(LoadASRecording(file_path))
+			_tcscpy(img_log_file_path_, file_path);
 
-	ctl_slider_frame_.SetFocus();
+		ctl_slider_frame_.SetFocus();
+	}
+	
+	return 0;
+}
+
+void CASImgView::SetStatusBar( HWND wnd )
+{
+	ctl_status_bar_.Attach(wnd);
 }
 
 

@@ -7,42 +7,13 @@
 #include <vector>
 #include "Layout.h"
 #include "..\cpt_data.h"
+#include "util\util.h"
 
 #include "asimg\DialogThumbs.h"
 #include "asimg\DialogInfo.h"
 #include "asimg\DialogImage.h"
-//#include "DialogRecord.h"
-
-struct img_frame_info
-{
-	union
-	{
-		__int64	 frmae_time_i64;
-		FILETIME frame_time;
-	};
-
-	LARGE_INTEGER	frame_data_pos;
-	POINT			mouse_pos;
-	LARGE_INTEGER	cursur_image_pos;
-};
-
-struct file_frame_header
-{
-	FILETIME	frame_time;
-	cpt_common	common;
-};
-
-struct time_duration
-{
-	unsigned short hour;
-	unsigned char  minute;
-	unsigned char  seconds;
-	unsigned short miniseconds;
-
-	static time_duration FromMiniseconds(LONGLONG miniseconds);
-	static time_duration FromSeconds(LONG seconds);
-};
-
+#include "asimg\ASRecordPackage.h"
+#include "asimg\ASFrameRes.h"
 
 enum { WM_PLAY_NEXTFRAME = WM_USER + 1021 };
 
@@ -120,8 +91,6 @@ public:
 	LRESULT OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnOK(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
-	
-
 	LRESULT OnBtnExportFrame(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnBtnExportImage(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnBtnLogDir(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -145,32 +114,28 @@ public:
 
 	void CloseDialog(int nVal);
 
-protected:
+public:
+	void InitFileList();
+	void SetStatusBar(HWND wnd);
 
-	void InitMeetingList();
+protected:
 	void InitImageTick();
 	void InitLogBlockBuffer();
 
-	bool LoadImgLogFile(LPCTSTR file_path);
-	void CloseImgLogFile();
-
-	bool LoadFrameData(int frame_index);
-
-	bool LoadImgLogContent();
+	bool LoadASRecording(LPCTSTR file_path);
+	void CloseASRecording();
 
 	bool UpdateTimeLine();
 
-	int	 GetImageFrameIndexOfSliderPos(int pos);
+	int	 GetFrameIndexOfTime(__int64 time);
 
 	void SetCurrentFrame(int frame_index, bool show_nearby);
-
-	HBITMAP LoadFrameImage(int frame_index);
 
 	void DisplayImageInStatic(HBITMAP hbp, DWORD ctl_id);
 
 	void RefreshThumbs();
 
-	void BuildNearbyImages(int first_frame_index);
+	//void BuildNearbyImages(int first_frame_index);
 	
 	static void ThreadEntry4Play(void*);
 	void LoopPlay();
@@ -179,8 +144,9 @@ protected:
 
 	void InitTabPanels();
 
-	POINT ReadMousePos(LONGLONG file_pos);
-	void  ReadCursorImage(LONGLONG file_pos);
+protected:
+	IASRecordPackage*	record_package_;
+	ASFrameRes			current_frame_res_;
 
 protected:
 	WTL::CComboBox		ctl_cmb_mettings_;
@@ -211,13 +177,11 @@ protected:
 
 	WTL::CComboBox		ctl_cmb_playrate_;
 
-	WTL::CScrollBar		ctl_scroll_v_;
-	WTL::CScrollBar		ctl_scroll_h_;
+	WTL::CStatusBarCtrl	ctl_status_bar_;
 
 	CDialogInfo			dlg_info_;
 	CDialogThumbs		dlg_thumbs_;
 	CDialogImage		dlg_image_;
-	//CDialogRecord		dlg_record_;
 
 	NSYedaoqLayout::CFlowLayout	layout_main_;
 
@@ -229,17 +193,14 @@ protected:
 	ULONG_PTR			read_timer_id_;
 
 protected:
-	std::vector<img_frame_info> img_frames_;
 	unsigned int				current_frame_index_;
 	LONGLONG					metting_duration_miniseconds_;
 	time_duration				metting_duration_;
 
-	LONGLONG					current_frame_cursor_image_pos_;
-
 	HDC							dc_memory_;
 
-	HBITMAP						nearby_frame_bitmaps_[7];
-	int							nearby_frame_index_base_;
+// 	HBITMAP						nearby_frame_bitmaps_[7];
+// 	int							nearby_frame_index_base_;
 
 protected:
 	POINT						log_file_latest_mousepos_;
