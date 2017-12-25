@@ -3,6 +3,7 @@
 #include "..\resource.h"
 #include "common.h"
 
+class ASFrameRes;
 
 class CDialogThumbs : public CDialogImpl<CDialogThumbs>, public CUpdateUI<CDialogThumbs>
 {
@@ -42,8 +43,16 @@ protected:
 protected:
 	void DrawOwnerDrawCtl( LPDRAWITEMSTRUCT lpDrawItem, HBITMAP hbp );
 
+public:
+	void SetFrameRes( ASFrameRes* res )
+	{
+		frame_res_ = res;
+	}
+
 protected:
 	HBITMAP*	thumb_handls_;
 	HDC			dc_memory_;
 	HBRUSH		brush_dlg_background_;
+
+	ASFrameRes* frame_res_;
 };

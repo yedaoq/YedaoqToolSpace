@@ -272,14 +272,7 @@ LRESULT CASImgView::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 	pLoop->RemoveMessageFilter(this);
 	pLoop->RemoveIdleHandler(this);
 
-// 	free(log_block_buf_);
-// 	log_block_buf_ = NULL;
-// 
-// 	if (INVALID_HANDLE_VALUE != img_log_file_handle_)
-// 	{
-// 		CloseHandle(img_log_file_handle_);
-// 		img_log_file_handle_ = INVALID_HANDLE_VALUE;
-// 	}
+	ctl_tab_panels_.DeleteAllItems();
 	
 	if (NULL != dc_memory_)
 	{
@@ -289,33 +282,6 @@ LRESULT CASImgView::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 
 	return 0;
 }
-
-// LRESULT CASImgView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled)
-// {
-// 	bHandled = TRUE;
-// 
-// 	HWND	hwnd_focus = GetFocus();
-// 	TCHAR	hwnd_class[128];
-// 	if (NULL != hwnd_focus)
-// 	{
-// 		GetClassName(hwnd_focus, hwnd_class, ARRAYSIZE(hwnd_class));
-// 	}
-// 
-// 	bHandled = TRUE;
-// 	switch(wParam)
-// 	{
-// 	case VK_SPACE:
-// 	case VK_LEFT:
-// 	case VK_RIGHT:
-// 		if (_tcscmp(hwnd_class, TEXT("")))
-// 		{
-// 			ctl_slider_frame_.SetFocus();
-// 			return 1;
-// 		}
-// 	}
-// 
-// 	return 1;
-// }
 
 LRESULT CASImgView::OnTimer( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled )
 {
@@ -336,14 +302,6 @@ LRESULT CASImgView::OnSize(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& bH
 		dlg_thumbs_.MoveWindow(0, 0, rc.right, rc.bottom - 20);
 		dlg_info_.MoveWindow(0, 0, rc.right, rc.bottom - 20);
 		//dlg_record_.MoveWindow(0, 0, rc.right, rc.bottom - 20);
-
-// 		ctl_pic_main_.GetClientRect(&rc);
-// 		int tmp = 4096 - rc.right;
-// 		ctl_scroll_h_.SetScrollRange(0, tmp > 0 ? tmp : 0, TRUE);
-// 		tmp = 2160 - rc.bottom;
-// 		ctl_scroll_v_.SetScrollRange(0, tmp > 0 ? tmp : 0, TRUE);
-
-		//ctl_scroll_v_.SetScrollPos(300, TRUE);
 	}
 
 	return 0;
@@ -374,17 +332,13 @@ void CASImgView::CloseDialog(int nVal)
 CASImgView::CASImgView()
 	: layout_main_(NSYedaoqLayout::Direction_Vertical), record_package_(0)
 {
-	//memset(nearby_frame_bitmaps_, 0, sizeof(nearby_frame_bitmaps_));
 	play_flag_ = false;
 	play_thread_handle_ = INVALID_HANDLE_VALUE;
-	//current_frame_cursor_image_pos_ = 0;
-	//current_frame_cursor_image_ = 0;
 
 	log_file_latest_cursorimage_pos_ = 0;
 	log_file_latest_mousepos_.x = 0;
 	log_file_latest_mousepos_.y = 0;
-// 
-// 	nearby_frame_index_base_ = -100;
+
 }
 
 void CASImgView::InitFileList()
@@ -471,6 +425,8 @@ bool CASImgView::LoadASRecording( LPCTSTR file_path )
 	ctl_slider_timeline_.SetPos(0);
 
 	dlg_image_.SetFrameRes(&current_frame_res_);
+	dlg_info_.SetFrameRes(&current_frame_res_);
+	dlg_thumbs_.SetFrameRes(&current_frame_res_);
 	//dlg_image_.SetASRecordPackage(record_package_);
 	UpdateTimeLine();
 	SetCurrentFrame(0, true);
@@ -538,21 +494,6 @@ LRESULT CASImgView::OnHScroll( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL
 		int frame_index = record_package_->GetFrameOfTime(ctl_slider_timeline_.GetPos());
 		SetCurrentFrame(frame_index, true);
 	}
-// 	else if((HWND)lParam == ctl_scroll_h_)
-// 	{
-// 		switch(LOWORD(wParam))
-// 		{
-// 		case SB_THUMBTRACK:
-// 		case SB_THUMBPOSITION:
-// 			image_main_scroll_x_ = HIWORD(wParam);
-// 			ctl_scroll_h_.SetScrollPos(image_main_scroll_x_);
-// 			ctl_pic_main_.Invalidate(TRUE);
-// 			break;
-// 		case SB_ENDSCROLL:
-// 			ctl_slider_frame_.SetFocus();
-// 			break;
-// 		}
-// 	}
 
 	return 0;
 }
@@ -560,36 +501,12 @@ LRESULT CASImgView::OnHScroll( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL
 LRESULT CASImgView::OnVScroll( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& bHandled )
 {
 	bHandled = TRUE;
-// 	if((HWND)lParam == ctl_scroll_v_)
-// 	{
-// 		switch(LOWORD(wParam))
-// 		{
-// 		case SB_THUMBTRACK:
-// 		case SB_THUMBPOSITION:
-// 			image_main_scroll_y_ = HIWORD(wParam);
-// 			ctl_scroll_v_.SetScrollPos(image_main_scroll_y_);
-// 			ctl_pic_main_.Invalidate(TRUE);
-// 			break;
-// 		case SB_ENDSCROLL:
-// 			ctl_slider_frame_.SetFocus();
-// 			break;
-// 		}
-// 	}
 	return 0;
 }
 
 LRESULT CASImgView::OnDrawItem( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& bHandled )
 {
 	bHandled = TRUE;
-
-//	LPDRAWITEMSTRUCT lpDrawItem = (LPDRAWITEMSTRUCT)lParam;
-
-// 	switch(wParam)
-// 	{
-// 	case IDC_PIC_MAIN:
-// 		DrawMainPic(lpDrawItem, image_main_);
-// 		break;
-// 	}
 	return 0;
 }
 
@@ -627,35 +544,14 @@ void CASImgView::SetCurrentFrame( int frame_index, bool refresh_panel )
 		ctl_txt_frame_continue_.SetWindowText(TEXT("00:00:0000"));
 	}
 	
-	// 重新加载当前帧
-// 	if (!LoadFrameData(frame_index))
-// 	{
-// 		MessageBox(TEXT("无法获取此帧数据！"), TEXT("提示"), MB_OK);
-// 		return;
-// 	}
-	
-// 	if (refresh_panel)
-// 	{
-// 		BOOL tmp;
-// 		OnTabPanelSwitched(0, 0, tmp);
-// 	}
+	if (refresh_panel)
+	{
+		BOOL tmp;
+		OnTabPanelSwitched(0, 0, tmp);
+	}
 
-	//dlg_image_.SetMousePos(&img_frames_[frame_index].mouse_pos);
 	dlg_image_.Refresh();
 }
-
-// HBITMAP CASImgView::LoadFrameImage( int frame_index )
-// {
-// 	if (LoadFrameData(frame_index))
-// 	{
-// 		cpt_screen_data* screen_data = (cpt_screen_data*)log_block_buf_;
-// 		BITMAPINFOHEADER bih = screen_data->bi.bmiHeader;
-// 		HBITMAP hbp = CreateBitmap(bih.biWidth, bih.biHeight < 0 ? -bih.biHeight : bih.biHeight, bih.biPlanes, bih.biBitCount, screen_data->get_image_bits());
-// 		return hbp;
-// 	}
-// 
-// 	return NULL;
-// }
 
 void CASImgView::DisplayImageInStatic( HBITMAP hbp, DWORD ctl_id )
 {
@@ -927,9 +823,9 @@ void CASImgView::InitTabPanels()
 	item.cchTextMax = 4;
 	ctl_tab_panels_.AddItem(&item);
 
-	item.pszText = TEXT("record");
-	item.cchTextMax = _tcslen(item.pszText);
-	ctl_tab_panels_.AddItem(&item);
+// 	item.pszText = TEXT("record");
+// 	item.cchTextMax = _tcslen(item.pszText);
+// 	ctl_tab_panels_.AddItem(&item);
 }
 
 // LRESULT CASImgView::OnTabPanelSwitched( WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled )

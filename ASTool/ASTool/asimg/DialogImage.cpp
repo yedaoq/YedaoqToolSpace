@@ -157,6 +157,7 @@ LRESULT CDialogImage::OnDestroy( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 {
 	bHandled = TRUE;
 	::SetWindowLongPtr(ctl_pic_main_, DWLP_DLGPROC, (LONG_PTR)g_win_proc_pic_main);
+	EndDialog(0);
 	return 0;
 }
 

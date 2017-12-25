@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "DialogThumbs.h"
 #include "..\resource.h"
+#include "ASFrameRes.h"
 
 
 CDialogThumbs::CDialogThumbs( void )
@@ -56,6 +57,7 @@ LRESULT CDialogThumbs::OnDrawItem( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, 
 
 LRESULT CDialogThumbs::OnDestroy( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/ )
 {
+	EndDialog(0);
 	return 0;
 }
 
@@ -93,6 +95,7 @@ LRESULT CDialogThumbs::OnSetThumbs( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lPa
 LRESULT CDialogThumbs::OnRefreshPanel( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled )
 {
 	bHandled = TRUE;
+	thumb_handls_ = frame_res_->NearbyImages();
 	InvalidateRect(NULL, FALSE);
 	return 0;
 }
@@ -109,8 +112,32 @@ void CDialogThumbs::DrawOwnerDrawCtl( LPDRAWITEMSTRUCT lpDrawItem, HBITMAP hbp )
 	BITMAP bitmap;
 	GetObject(hbp, sizeof(bitmap), &bitmap);
 
+	float rate_x = (float)(lpDrawItem->rcItem.right - lpDrawItem->rcItem.left) / bitmap.bmWidth;
+	float rate_y = (float)(lpDrawItem->rcItem.bottom - lpDrawItem->rcItem.top) / abs(bitmap.bmHeight);
+
+	RECT rc;
+	if (rate_x > rate_y)
+	{
+		rc.top = lpDrawItem->rcItem.top;
+		rc.bottom = lpDrawItem->rcItem.bottom;
+
+		int width = rate_y * bitmap.bmWidth;
+		rc.left = 0;
+		rc.right = width;
+	}
+	else
+	{
+		rc.left = lpDrawItem->rcItem.left;
+		rc.right = lpDrawItem->rcItem.right;
+
+		int height = rate_x * abs(bitmap.bmHeight);
+
+		rc.top = 0;
+		rc.bottom = height;
+	}
+
 	SetStretchBltMode(lpDrawItem->hDC, STRETCH_HALFTONE); 
-	StretchBlt(lpDrawItem->hDC, lpDrawItem->rcItem.left, lpDrawItem->rcItem.top, lpDrawItem->rcItem.right, lpDrawItem->rcItem.bottom, dc_memory_, 0, 0, bitmap.bmWidth, bitmap.bmHeight, SRCCOPY);
+	StretchBlt(lpDrawItem->hDC, rc.left, rc.top, rc.right, rc.bottom, dc_memory_, 0, 0, bitmap.bmWidth, bitmap.bmHeight, SRCCOPY);
 }
 
 LRESULT CDialogThumbs::OnDlgColor( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled )

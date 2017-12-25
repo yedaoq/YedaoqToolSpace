@@ -115,7 +115,7 @@ void ASFrameRes::UpdateNearbyImages()
 
 	HBITMAP bitmaps[ARRAYSIZE(nearby_screen_images_)] = {0};
 
-	for (int i = current_frame_index_ - 3; i > current_frame_index_ + 3; ++i)
+	for (int i = current_frame_index_ - 3; i <= current_frame_index_ + 3; ++i)
 	{
 		if (i >= 0 && i < record_frame_count)
 		{

@@ -22,6 +22,7 @@ LRESULT CDialogInfo::OnInitDialog( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lP
 
 LRESULT CDialogInfo::OnDestroy( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/ )
 {
+	EndDialog(0);
 	return 0;
 }
 
