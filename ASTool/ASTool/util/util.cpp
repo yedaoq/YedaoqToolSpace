@@ -321,3 +321,15 @@ __int64 GetTimeDeltaMiniseconds( const FILETIME& t1, const FILETIME& t2 )
 {
 	return ((__int64&)t1 - (__int64&)t2) / 10000;
 }
+
+void DebugOuput( LPCTSTR lpszFormat, ... )
+{
+	TCHAR buf[1024];
+	va_list argptr;
+	va_start(argptr, lpszFormat);
+	int len = wvsprintf(buf, lpszFormat, argptr);
+	va_end(argptr);
+	buf[len] = '\n';
+	buf[len + 1] = 0;
+	OutputDebugString(buf);
+}

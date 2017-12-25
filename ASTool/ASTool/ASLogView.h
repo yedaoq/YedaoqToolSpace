@@ -82,7 +82,10 @@ protected:
 	WTL::CComboBox	ctl_cmb_file_filter_;
 	HWND			ctl_log_;
 
+	HMODULE			sciLexer_module_;
+
 	NSYedaoqLayout::CFlowLayout*	layout_main_;
+	NSYedaoqLayout::CCtrlLayout*	layout_log_;
 
 	HANDLE			log_file_handle_;
 	LARGE_INTEGER	log_file_position_;

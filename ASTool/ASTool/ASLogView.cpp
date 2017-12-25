@@ -12,6 +12,7 @@
 #include "Scintilla/Scintilla.h"
 #include "FilterList.h"
 #include "util/util.h"
+#include <Strsafe.h>
 
 const int		read_buffer_size_ = 0x1000;
 
@@ -55,6 +56,8 @@ CASLogView::CASLogView()
 {
 	layout_main_ = new NSYedaoqLayout::CFlowLayout(NSYedaoqLayout::Direction_Vertical);
 	ctl_log_ = NULL;
+	sciLexer_module_ = NULL;
+	layout_log_ = NULL;
 }
 
 BOOL CASLogView::PreTranslateMessage(MSG* pMsg)
@@ -108,7 +111,7 @@ LRESULT CASLogView::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	layout_top->AddCtrl(GetDlgItem(IDOK));
 	layout_top->AddCtrl(GetDlgItem(IDC_BTN_CLEAR));
 
-	layout_main_->AddCtrl(ctl_log_, NSYedaoqLayout::ResizeInfo::FillInfo, NSYedaoqLayout::ResizeInfo::FillInfo);
+	layout_log_ = layout_main_->AddCtrl(ctl_log_, NSYedaoqLayout::ResizeInfo::FillInfo, NSYedaoqLayout::ResizeInfo::FillInfo);
 
 	//AllocConsole();
 	//log_console_handle_ = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -183,7 +186,7 @@ LRESULT CASLogView::OnCbnSelchangeCmbFiles(WORD /*wNotifyCode*/, WORD /*wID*/, H
 			return 0;
 		}
 
-		::SendMessage(ctl_log_, SCI_CLEARALL, 0, 0);
+		ClearLog();
 	}
 	return 0;
 }
@@ -225,15 +228,24 @@ void CASLogView::CloseLogFile()
 	}
 }
 
-LRESULT CASLogView::OnTimer(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+LRESULT CASLogView::OnTimer(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled)
 {
+	bHandled = TRUE;
 	// TODO: Add your message handler code here and/or call default
 	if (read_timer_id_ == (UINT_PTR)wParam )
 	{
 		if (INVALID_HANDLE_VALUE != log_file_handle_)
 		{
+			int log_line_count = ::SendMessage(ctl_log_, SCI_GETLINECOUNT, 0, 0);
+			if (log_line_count > 2000000)
+			{
+				int pos = ::SendMessage(ctl_log_, SCI_POSITIONFROMLINE, 500000, 0 );
+				DebugOuput(TEXT("To many log lines (%d), remove first 500000 lines, %d"), log_line_count, pos);
+
+				::SendMessage(ctl_log_, SCI_DELETERANGE, 0, pos);
+			}
+
 			ReadLogAsync();
-			OutputDebugStringA("OnTimer\r\n");
 		}
 	}
 
@@ -320,27 +332,6 @@ bool CASLogView::ReadLogAsync()
 	return true;
 }
 
-// bool CASLogView::ReadLog()
-// {
-// 	DWORD bytes_readed = 0;
-// 	do 
-// 	{
-// 		BOOL ret = ReadFile(log_file_handle_, read_buffer_ + read_content_end_, read_buffer_size_ - read_content_end_, &bytes_readed, NULL);
-// 		if (!ret)
-// 			break;
-// 
-// 		OutputDebugStringA("Read block!\r\n");
-// 
-// 		read_content_end_ += bytes_readed;
-// 		read_buffer_[read_content_end_] = 0;
-// 
-// 		ParseLogContent();
-// 	
-// 	} while (bytes_readed > 0);
-// 	
-// 	return true;
-// }
-
 bool CASLogView::ParseLogContent(ReadBuffer* buf)
 {
 	static char msg_line_long[] = "log line too long to hold!\n";
@@ -415,52 +406,14 @@ bool CASLogView::ParseLogContent(ReadBuffer* buf)
 void CASLogView::PrintLog( const char* log, int log_len )
 {
 	::SendMessage(ctl_log_, SCI_APPENDTEXT /*SCI_ADDTEXT*/, log_len, (LPARAM)log);
-	//WriteConsoleA(log_console_handle_, log, log_len, NULL, NULL );
-	//puts(log);
 }
-
-// bool CASLogView::ParseLogContent()
-// {
-// 	static TCHAR wide_buf[4096] = TEXT("123");
-// 
-// 	char* content_begin = read_buffer_ + read_content_begin_;
-// 	char* content_end = read_buffer_ + read_content_end_;
-// 	for (char* content_ptr = strchr(content_begin, '\n'); content_ptr; content_ptr = strchr(content_begin, '\n'))
-// 	{
-// 		*content_ptr = 0;
-// 		if (content_ptr > content_begin)
-// 		{
-// 			int ret = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, content_begin, content_ptr - content_begin + 1, wide_buf, ARRAYSIZE(wide_buf));
-// 			if (ret > 0)
-// 			{
-// 				ctl_lst_log_.AddString(wide_buf);
-// 			}
-// 		}
-// 
-// 		content_begin = content_ptr + 1;
-// 		read_content_begin_ = content_begin - read_buffer_;
-// 	}
-// 
-// 	if (read_content_end_ == read_content_begin_)
-// 	{
-// 		read_content_begin_ = read_content_end_ = 0;
-// 	}
-// 	else if(read_content_end_ >= read_buffer_size_)
-// 	{
-// 		read_content_end_ = read_content_end_ - read_content_begin_;
-// 		memmove(read_buffer_, read_buffer_ + read_content_begin_, read_content_end_);
-// 		read_content_begin_	= 0;
-// 	}
-// 
-// 	return true;
-// }
 
 LRESULT CASLogView::OnSize(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
 	// TODO: Add your message handler code here and/or call default
 	if (SIZE_MINIMIZED != wParam)
 	{
-		this->layout_main_->Layout(NSYedaoqLayout::LayoutPoint(3,3), NSYedaoqLayout::LayoutSize(LOWORD(lParam) - 6, HIWORD(lParam) - 6));
+		this->layout_main_->Layout(NSYedaoqLayout::LayoutPoint(1,1), NSYedaoqLayout::LayoutSize(LOWORD(lParam) - 2, HIWORD(lParam) - 2));
 		InvalidateRect(NULL, TRUE);
 	}
 	return 0;
@@ -566,7 +519,7 @@ void CASLogView::UpdateFilters()
 
 	log_filters_[log_filter_count] = 0;
 
-	::SendMessage(ctl_log_, SCI_CLEARALL, 0, 0);
+	ClearLog();
 }
 
 
@@ -579,27 +532,67 @@ LRESULT CASLogView::OnBnClickedBtnClear(WORD /*wNotifyCode*/, WORD /*wID*/, HWND
 
 void CASLogView::ClearLog()
 {
-	::SendMessage(ctl_log_, SCI_CLEARALL, 0, 0);
+	int log_line_count = ::SendMessage(ctl_log_, SCI_GETLINECOUNT, 0, 0);
+	int pos = ::SendMessage(ctl_log_, SCI_POSITIONFROMLINE, log_line_count, 0 );
+	if (pos > 0 && ctl_log_)
+	{
+		DebugOuput(TEXT("clear log, line : %d, pos : %d"), log_line_count, pos);
+
+		DWORD result = 0;
+		//if (0 == ::SendMessageTimeout(ctl_log_, SCI_DELETERANGE, 0, pos, 2000, SMTO_NORMAL, &result))
+		if (0 == ::SendMessageTimeout(ctl_log_, SCI_CLEARALL, 0, 0, 2000, SMTO_NORMAL, &result))
+		{
+			if (::SendMessage(ctl_log_, SCI_POSITIONFROMLINE, log_line_count, 0 ) == pos)
+			{
+				DebugOuput(TEXT("fail to clear log, try to re-create log control"));
+				InitSciLexerCtrl();
+
+				RECT rc;
+				GetClientRect(&rc);
+				BOOL bHandled;
+				OnSize(WM_SIZE, 0, MAKELPARAM(rc.right, rc.bottom), bHandled);
+			}
+		}
+	}
+
+	//::SendMessage(ctl_log_, SCI_CLEARALL, 0, 0);
 }
 
 bool CASLogView::InitSciLexerCtrl()
 {
-	HMODULE sciLexer_module = ::LoadLibrary(TEXT("SciLexer.dll"));
-	if (!sciLexer_module)
+	if (!sciLexer_module_)
 	{
-		TCHAR sciLexer_path[MAX_PATH * 2] = TEXT("");
-		HMODULE app_module = GetModuleHandle(NULL);
-		GetModuleFileName(app_module, sciLexer_path, ARRAYSIZE(sciLexer_path));
-		::PathRemoveFileSpec(sciLexer_path);
-		::PathAppend(sciLexer_path, TEXT("SciLexer.dll"));
+		sciLexer_module_ = ::LoadLibrary(TEXT("SciLexer.dll"));
+		if (!sciLexer_module_)
+		{
+			TCHAR sciLexer_path[MAX_PATH * 2] = TEXT("");
+			HMODULE app_module = GetModuleHandle(NULL);
+			GetModuleFileName(app_module, sciLexer_path, ARRAYSIZE(sciLexer_path));
+			::PathRemoveFileSpec(sciLexer_path);
+			::PathAppend(sciLexer_path, TEXT("SciLexer.dll"));
 
-		if(ExtractResource(app_module, IDR_DLL_SCILEXER, TEXT("DLL"), ExtractResourceCallback_SaveToFile, sciLexer_path))
-			sciLexer_module = ::LoadLibrary(TEXT("SciLexer.dll"));
+			if(ExtractResource(app_module, IDR_DLL_SCILEXER, TEXT("DLL"), ExtractResourceCallback_SaveToFile, sciLexer_path))
+				sciLexer_module_ = ::LoadLibrary(TEXT("SciLexer.dll"));
+		}
 	}
 
-	if (sciLexer_module)
+	if (sciLexer_module_)
 	{
-		ctl_log_ = CreateWindowEx(0, TEXT("Scintilla"), NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN, 6, 40, 500, 400, *this, NULL, NULL, NULL);
+		RECT rc = {6, 40, 506, 440};
+		if (ctl_log_)
+		{
+			//::GetWindowRect(ctl_log_, &rc);
+			::DestroyWindow(ctl_log_);
+			ctl_log_ = NULL;
+
+			//DebugOuput(TEXT("log window : (%d, %d, %d, %d)"), rc.left, rc.top, rc.right, rc.bottom);
+		}
+
+		ctl_log_ = CreateWindowEx(0, TEXT("Scintilla"), NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, *this, NULL, NULL, NULL);
+		if (layout_log_)
+		{
+			layout_log_->SetHwnd(ctl_log_);
+		}
 	}
 	else
 	{

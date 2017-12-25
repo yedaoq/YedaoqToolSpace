@@ -160,6 +160,7 @@ namespace NSYedaoqLayout
 		virtual ILayout*			Clone()	const	{ return new CCtrlLayout(HWnd_, ResizeInfoH_, ResizeInfoV_, AnchorInfoH_, AnchorInfoV_); }
 
 		HWND						GetHWnd()		{ return HWnd_; }
+		void						SetHwnd(HWND wnd)		{ HWnd_ = wnd; }
 
 		virtual const ResizeInfo&	GetResizeInfo(EnumLayoutDirection dir);
 		virtual const AnchorInfo&	GetAnchorInfo(EnumLayoutDirection dir);

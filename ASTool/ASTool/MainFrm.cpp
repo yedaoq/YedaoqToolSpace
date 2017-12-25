@@ -46,7 +46,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	CheckWindowsMenuItem(menuMain, ID_ASIMG_ENABLE, IsToolRecordInstalled());
 
 	view_log_.Create(m_view);
-	m_view.AddPage(view_log_.m_hWnd, _T("Log"));
+	m_view.AddPage(view_log_.m_hWnd, _T("Live Log"));
 
 	view_as_img_.Create(m_view);
 	m_view.AddPage(view_as_img_.m_hWnd, _T("AS Image"));
@@ -78,7 +78,7 @@ LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 //	CASToolView* pView = new CASToolView;
 	CASLogView* pView = new CASLogView;
 	pView->Create(m_view);
-	m_view.AddPage(pView->m_hWnd, _T("Log"));
+	m_view.AddPage(pView->m_hWnd, _T("Live Log"));
 
 	// TODO: add code to initialize document
 

@@ -573,58 +573,6 @@ void CASImgView::DisplayImageInStatic( HBITMAP hbp, DWORD ctl_id )
 
 }
 
-// void CASImgView::RefreshThumbs()
-// {
-// 	DWORD ctl_thumb_ids[] = {IDC_PIC_THUMB1, IDC_PIC_THUMB2, IDC_PIC_THUMB3, IDC_PIC_THUMB4, IDC_PIC_THUMB5, IDC_PIC_THUMB6, IDC_PIC_THUMB7 };
-// 	for (int i = 0; i < ARRAYSIZE(nearby_frame_bitmaps_); ++i)	{
-// 		DisplayImageInStatic(nearby_frame_bitmaps_[i], ctl_thumb_ids[i]);
-// 		//::SendMessage(GetDlgItem(ctl_thumb_ids[i]), STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)nearby_frame_bitmaps_[i]);
-// 	}
-// }
-
-// void CASImgView::DrawOwnerDrawCtl( LPDRAWITEMSTRUCT lpDrawItem, HBITMAP hbp )
-// {
-// 	if (NULL == hbp)
-// 	{
-// 		return;
-// 	}
-// 
-// 	HGLOBAL prev_obj = SelectObject(dc_memory_, hbp);
-// 
-// 	BITMAP bitmap;
-// 	GetObject(hbp, sizeof(bitmap), &bitmap);
-// 
-// 	SetStretchBltMode(lpDrawItem->hDC, STRETCH_HALFTONE); 
-// 	StretchBlt(lpDrawItem->hDC, lpDrawItem->rcItem.left, lpDrawItem->rcItem.top, lpDrawItem->rcItem.right, lpDrawItem->rcItem.bottom, dc_memory_, 0, 0, bitmap.bmWidth, bitmap.bmHeight, SRCCOPY);
-// 	SelectObject(prev_obj);
-// }
-
-// bool CASImgView::LoadFrameData( int frame_index )
-// {
-// 	LARGE_INTEGER frame_pos = img_frames_[frame_index].frame_data_pos;
-// 
-// 	SetFilePointerEx(img_log_file_handle_, frame_pos, NULL, FILE_BEGIN);
-// 
-// 	DWORD bytes_readed = 0;
-// 	ReadFile(img_log_file_handle_, log_block_buf_, sizeof(cpt_common), &bytes_readed, NULL);
-// 	if (bytes_readed < sizeof(cpt_common))
-// 	{
-// 		return false;
-// 	}
-// 
-// 	if (cpt_dt_screen_capture == log_block_data_header_->data_type)
-// 	{
-// 		SetFilePointerEx(img_log_file_handle_, frame_pos, NULL, FILE_BEGIN);
-// 		ReadFile(img_log_file_handle_, log_block_buf_, log_block_data_header_->size, &bytes_readed, NULL);
-// 		if (bytes_readed < log_block_data_header_->size)
-// 		{
-// 			return false;
-// 		}
-// 	}
-// 
-// 	return true;
-// }
-
 LRESULT CASImgView::OnBtnRegion( WORD /*wNotifyCode*/, WORD wID, HWND hWndCtl, BOOL& bHandled )
 {
 	bHandled = TRUE;
@@ -658,7 +606,6 @@ LRESULT CASImgView::OnBtnImageErase( WORD /*wNotifyCode*/, WORD wID, HWND hWndCt
 {
 	bHandled = TRUE;
 	dlg_image_.SetImageErase(0 != ctl_chk_image_erase_.GetCheck());
-// 	render_image_erase_ = ctl_chk_image_erase_.GetCheck();
  	ctl_slider_frame_.SetFocus();
 	return 0;
 }
@@ -667,7 +614,6 @@ LRESULT CASImgView::OnBtnRegionFill( WORD /*wNotifyCode*/, WORD wID, HWND /*hWnd
 {
 	bHandled = TRUE;
 	dlg_image_.SetRegionFill(0 != ctl_chk_region_fill_.GetCheck());
-	//render_region_fill_ = (0 != ctl_chk_region_fill_.GetCheck());
 	ctl_slider_frame_.SetFocus();
 	return 0;
 }
@@ -696,49 +642,6 @@ LRESULT CASImgView::OnBtnPlay( WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/,
 
 	return 0;
 }
-
-// void CASImgView::BuildNearbyImages( int first_frame_index )
-// {
-	//throw 1;
-// 	int prev_nearby_frame_base_index = nearby_frame_index_base_;
-// 	HBITMAP	prev_nearby_bitmaps[7];
-// 	memcpy(prev_nearby_bitmaps, nearby_frame_bitmaps_, sizeof(prev_nearby_bitmaps));
-// 
-// 	nearby_frame_index_base_ = first_frame_index;
-// 
-// 	int reload_range_lbound = 0;
-// 	int reload_range_ubound = ARRAYSIZE(nearby_frame_bitmaps_);
-// 
-// 	for (int idx = 0; idx < ARRAYSIZE(prev_nearby_bitmaps); ++idx)
-// 	{
-// 		int nearby_frame_index = nearby_frame_index_base_ + idx;
-// 		if (nearby_frame_index >= 0 && (unsigned int)nearby_frame_index < img_frames_.size())
-// 		{
-// 			if(nearby_frame_index >= prev_nearby_frame_base_index && nearby_frame_index < (prev_nearby_frame_base_index + 7/* ARRAYSIZE(prev_nearby_bitmaps)*/) 
-// 				&& NULL != prev_nearby_bitmaps[nearby_frame_index - prev_nearby_frame_base_index])
-// 			{
-// 				nearby_frame_bitmaps_[idx] = prev_nearby_bitmaps[nearby_frame_index - prev_nearby_frame_base_index];
-// 				prev_nearby_bitmaps[nearby_frame_index - prev_nearby_frame_base_index] = NULL;
-// 			}
-// 			else
-// 			{
-// 				nearby_frame_bitmaps_[idx] = LoadFrameImage(nearby_frame_index);
-// 			}
-// 		}
-// 		else
-// 		{
-// 			nearby_frame_bitmaps_[idx] = NULL;
-// 		}
-// 	}
-// 
-// 	for (int i = 0; i < ARRAYSIZE(prev_nearby_bitmaps); ++i)
-// 	{
-// 		if (NULL != prev_nearby_bitmaps[i])
-// 		{
-// 			DeleteObject(prev_nearby_bitmaps[i]);
-// 		}
-// 	}
-//}
 
 void CASImgView::StartPlay()
 {
@@ -828,19 +731,6 @@ void CASImgView::InitTabPanels()
 // 	ctl_tab_panels_.AddItem(&item);
 }
 
-// LRESULT CASImgView::OnTabPanelSwitched( WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled )
-// {
-// 	bHandled = TRUE;
-// 	HWND panels[] = {dlg_thumbs_, dlg_info_};
-// 	int cur_sel = ctl_tab_panels_.GetCurSel();
-// 	for (int i = 0; i < ARRAYSIZE(panels); ++i)
-// 	{
-// 		::ShowWindow(panels[i], (cur_sel == i) ? SW_SHOWMINIMIZED : SW_HIDE);
-// 	}
-// 
-// 	return 0;
-// }
-
 LRESULT CASImgView::OnTabPanelSwitched( int wParam, LPNMHDR lpnh, BOOL& bHandled )
 {
 	bHandled = TRUE;
@@ -861,33 +751,6 @@ LRESULT CASImgView::OnTabPanelSwitched( int wParam, LPNMHDR lpnh, BOOL& bHandled
 
 	return 0;
 }
-
-// void CASImgView::DrawImageArea( LPDRAWITEMSTRUCT lpDrawItem, RECT* image_area )
-// {
-// 	if (image_area->left > 0)
-// 	{
-// 		RECT rc = {image_area->left + 20, 20, image_area->left + 21, lpDrawItem->rcItem.bottom};
-// 		InvertRect(lpDrawItem->hDC, &rc);
-// 	}
-// 
-// 	if (image_area->right > 0)
-// 	{
-// 		RECT rc = {image_area->right + 20, 20, image_area->right + 21, lpDrawItem->rcItem.bottom};
-// 		InvertRect(lpDrawItem->hDC, &rc);
-// 	}
-// 
-// 	if (image_area->top > 0)
-// 	{
-// 		RECT rc = {20, image_area->top + 20, lpDrawItem->rcItem.right, image_area->top + 21};
-// 		InvertRect(lpDrawItem->hDC, &rc);
-// 	}
-// 
-// 	if (image_area->bottom > 0)
-// 	{
-// 		RECT rc = {20, image_area->bottom + 20, lpDrawItem->rcItem.right, image_area->bottom + 21};
-// 		InvertRect(lpDrawItem->hDC, &rc);
-// 	}
-// }
 
 LRESULT CASImgView::OnBtnExportFrame( WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled )
 {
@@ -914,9 +777,8 @@ LRESULT CASImgView::OnBtnExportImage( WORD /*wNotifyCode*/, WORD wID, HWND /*hWn
 LRESULT CASImgView::OnBtnLogDir( WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled )
 {
 	bHandled = TRUE;
-	WCHAR path_buf[MAX_PATH];
-	SHGetSpecialFolderPath(NULL, path_buf, CSIDL_APPDATA, FALSE);
-	::PathAppend(path_buf, _T("Zoom\\logs\\"));
+	WCHAR path_buf[MAX_PATH * 2];
+	GetProductLogDir(path_buf, ARRAYSIZE(path_buf));
 	::ShellExecute(NULL, TEXT("explore"), path_buf, NULL, NULL, SW_SHOWNORMAL);
 	ctl_slider_frame_.SetFocus();
 	return 0;
@@ -945,104 +807,6 @@ LRESULT CASImgView::OnBtnScale( WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/
 	ctl_slider_frame_.SetFocus();
 	return 0;
 }
-
-// POINT CASImgView::ReadMousePos(LONGLONG file_pos )
-// {	
-// 	cpt_mouse_position_data* data = (cpt_mouse_position_data*)log_block_buf_;
-// 	DWORD bytes_readed = 0;
-// 	POINT pt = {0, 0};
-// 	SetFilePointerEx(img_log_file_handle_, (LARGE_INTEGER&)file_pos, NULL, FILE_BEGIN);
-// 
-// 	ReadFile(img_log_file_handle_, log_block_buf_, sizeof(cpt_mouse_position_data), &bytes_readed, NULL);
-// 	if (bytes_readed >= sizeof(cpt_mouse_position_data))
-// 	{
-// 		pt = data->pos;
-// 	}
-// 
-// 	return pt;
-// }
-
-// void CASImgView::ReadCursorImage( LONGLONG file_pos )
-// {
-// 	if(current_frame_cursor_image_) DestroyIcon(current_frame_cursor_image_);
-// 	current_frame_cursor_image_ = NULL;
-// 
-// 	if (0 == file_pos)
-// 	{
-// 		return;
-// 	}
-// 
-// 	cpt_mouse_pointer_data* data = (cpt_mouse_pointer_data*)log_block_buf_;
-// 	SetFilePointerEx(img_log_file_handle_, (LARGE_INTEGER&)file_pos, NULL, FILE_BEGIN);
-// 
-// 	DWORD bytes_readed = 0;
-// 	ReadFile(img_log_file_handle_, log_block_buf_, sizeof(cpt_common), &bytes_readed, NULL);
-// 	if (bytes_readed < sizeof(cpt_common))
-// 	{
-// 		return;
-// 	}
-// 
-// 	bytes_readed = 0;
-// 	ReadFile(img_log_file_handle_, log_block_buf_ + sizeof(cpt_common), log_block_data_header_->size - sizeof(cpt_common), &bytes_readed, NULL);
-// 	if (bytes_readed < log_block_data_header_->size - sizeof(cpt_common))
-// 	{
-// 		return;
-// 	}
-// 
-// 	LPBYTE color_bits = data->pointer_bits + align_data_32(data->pointer_shape.cx, 1)*data->pointer_shape.cy;
-// 
-// 	if(data->pointer_shape.BitsPixel == 32)
-// 	{
-// 		HBITMAP bmp_mask = CreateBitmap(data->pointer_shape.cx, data->pointer_shape.cy, 1, 1, data->pointer_bits);
-// 
-// 		HDC hdc = ::GetDC(NULL);
-// 
-// 		BYTE bis[256];
-// 		BITMAPV5HEADER& bi = *(BITMAPV5HEADER*)bis;
-// 
-// 		ZeroMemory(&bi,sizeof(BITMAPV5HEADER));
-// 		bi.bV5Size           = sizeof(BITMAPV5HEADER);
-// 		bi.bV5Width           = data->pointer_shape.cx;
-// 		bi.bV5Height          = -data->pointer_shape.cy;
-// 		bi.bV5Planes = 1;
-// 		bi.bV5BitCount = 32;
-// 		bi.bV5Compression = BI_BITFIELDS;
-// 		bi.bV5RedMask   =  0x00FF0000;
-// 		bi.bV5GreenMask =  0x0000FF00;
-// 		bi.bV5BlueMask  =  0x000000FF;
-// 		bi.bV5AlphaMask =  0xFF000000; 
-// 		bi.bV5SizeImage = data->pointer_shape.cbWidth * data->pointer_shape.cy;
-// 
-// 		LPBYTE bmp_bits;
-// 		HBITMAP bmp_cursor = CreateDIBSection(hdc, (BITMAPINFO*)&bi, DIB_RGB_COLORS, (LPVOID*)&bmp_bits, NULL, 0);
-// 		memcpy(bmp_bits, color_bits, data->pointer_shape.cbWidth * data->pointer_shape.cy);
-// 	/*
-// 			LPDWORD lpbits = (LPDWORD)bmp_bits;
-// 			for(int i = 0; i< cs.cx*cs.cy; i++)
-// 		{
-// 				if((lpbits[i]&0xFF000000)== 0xFF000000)
-// 					lpbits[i] &= 0x6fffffff;
-// 		}
-// 	*/
-// 		::ReleaseDC(NULL, hdc);
-// 
-// 		ICONINFO icn_info;
-// 		icn_info.fIcon = FALSE;
-// 		icn_info.xHotspot = data->pointer_shape.xHotSpot;
-// 		icn_info.yHotspot = data->pointer_shape.yHotSpot;
-// 		icn_info.hbmMask = bmp_mask;
-// 		icn_info.hbmColor = bmp_cursor;
-// 
-// 		current_frame_cursor_image_ = CreateIconIndirect(&icn_info);
-// 
-// 		DeleteObject(bmp_mask);
-// 		DeleteObject(bmp_cursor);
-// 	}
-// 	else
-// 	{
-// 		current_frame_cursor_image_ = CreateIcon(GetModuleHandle(NULL), data->pointer_shape.cx, data->pointer_shape.cy, data->pointer_shape.Planes, data->pointer_shape.BitsPixel,  data->pointer_bits, color_bits);
-// 	}
-// }
 
 LRESULT CASImgView::OnPlaySwitch( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled )
 {

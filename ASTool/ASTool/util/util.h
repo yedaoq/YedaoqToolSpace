@@ -44,5 +44,7 @@ bool IsWindowsMenuItemChecked(HMENU menu, DWORD item_id, bool default);
 
 __int64 GetTimeDeltaMiniseconds(const FILETIME& t1, const FILETIME& t2);
 
+void DebugOuput(LPCTSTR lpszFormat, ...);
+
 
 /*BOOL IsUserAdmin();*/
