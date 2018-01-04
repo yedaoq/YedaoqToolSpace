@@ -50,7 +50,7 @@ public:
 	}
 
 protected:
-	HBITMAP*	thumb_handls_;
+	HBITMAP*	thumb_handles_;
 	HDC			dc_memory_;
 	HBRUSH		brush_dlg_background_;
 

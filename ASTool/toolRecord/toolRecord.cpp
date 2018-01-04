@@ -13,6 +13,15 @@
 static TCHAR	img_log_file_path_[MAX_PATH * 2] = TEXT("");
 static HANDLE	img_log_file_handle_ = INVALID_HANDLE_VALUE;
 
+void NotifyASTool(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	HWND tool_wnd = FindWindow(/*TEXT("ATL:0135F5B0")*/ NULL , TEXT("ASTool"));
+	if (tool_wnd)
+	{
+		::PostMessage(tool_wnd, message, wParam, lParam);
+	}
+}
+
 extern "C" __declspec(dllexport) bool log_init(LPCTSTR log_file_path)
 {
 	if (!log_file_path || !*log_file_path)
@@ -26,6 +35,8 @@ extern "C" __declspec(dllexport) bool log_init(LPCTSTR log_file_path)
 	::PathRenameExtension(img_log_file_path_, TEXT(".imgs"));
 
 	img_log_file_handle_ = CreateFile(img_log_file_path_, FILE_WRITE_DATA, FILE_SHARE_READ, NULL, OPEN_ALWAYS, NULL, NULL);
+	NotifyASTool(WM_USER + 1, 0, (LPARAM)img_log_file_handle_);
+
 	return INVALID_HANDLE_VALUE != img_log_file_handle_;
 }
 
@@ -36,6 +47,8 @@ extern "C" __declspec(dllexport) void log_uninit()
 		FlushFileBuffers(img_log_file_handle_);
 		CloseHandle(img_log_file_handle_);
 		img_log_file_handle_ = INVALID_HANDLE_VALUE;
+
+		NotifyASTool(WM_USER + 2, 0, 0);
 	}
 
 	*img_log_file_path_ = 0;

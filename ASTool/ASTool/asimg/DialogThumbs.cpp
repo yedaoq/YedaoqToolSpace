@@ -6,7 +6,7 @@
 
 CDialogThumbs::CDialogThumbs( void )
 {
-	thumb_handls_ = 0;
+	thumb_handles_ = 0;
 	brush_dlg_background_ = CreateSolidBrush(0xDDDDDD);
 }
 
@@ -26,30 +26,35 @@ LRESULT CDialogThumbs::OnDrawItem( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, 
 {
 	bHandled = TRUE;
 
+	if (!thumb_handles_)
+	{
+		return 0;
+	}
+
 	LPDRAWITEMSTRUCT lpDrawItem = (LPDRAWITEMSTRUCT)lParam;
 
 	switch(wParam)
 	{
 	case IDC_BTN_THUMB1:
-		DrawOwnerDrawCtl(lpDrawItem, thumb_handls_[0]);
+		DrawOwnerDrawCtl(lpDrawItem, thumb_handles_[0]);
 		break;
 	case IDC_BTN_THUMB2:
-		DrawOwnerDrawCtl(lpDrawItem, thumb_handls_[1]);
+		DrawOwnerDrawCtl(lpDrawItem, thumb_handles_[1]);
 		break;
 	case IDC_BTN_THUMB3:
-		DrawOwnerDrawCtl(lpDrawItem, thumb_handls_[2]);
+		DrawOwnerDrawCtl(lpDrawItem, thumb_handles_[2]);
 		break;
 	case IDC_BTN_THUMB4:
-		DrawOwnerDrawCtl(lpDrawItem, thumb_handls_[3]);
+		DrawOwnerDrawCtl(lpDrawItem, thumb_handles_[3]);
 		break;
 	case IDC_BTN_THUMB5:
-		DrawOwnerDrawCtl(lpDrawItem, thumb_handls_[4]);
+		DrawOwnerDrawCtl(lpDrawItem, thumb_handles_[4]);
 		break;
 	case IDC_BTN_THUMB6:
-		DrawOwnerDrawCtl(lpDrawItem, thumb_handls_[5]);
+		DrawOwnerDrawCtl(lpDrawItem, thumb_handles_[5]);
 		break;
 	case IDC_BTN_THUMB7:
-		DrawOwnerDrawCtl(lpDrawItem, thumb_handls_[6]);
+		DrawOwnerDrawCtl(lpDrawItem, thumb_handles_[6]);
 		break;
 	}
 	return 0;
@@ -88,14 +93,14 @@ LRESULT CDialogThumbs::OnSize( UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL
 LRESULT CDialogThumbs::OnSetThumbs( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& bHandled )
 {
 	bHandled = TRUE;
-	thumb_handls_ = (HBITMAP*)lParam;
+	thumb_handles_ = (HBITMAP*)lParam;
 	return 0;
 }
 
 LRESULT CDialogThumbs::OnRefreshPanel( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled )
 {
 	bHandled = TRUE;
-	thumb_handls_ = frame_res_->NearbyImages();
+	thumb_handles_ = frame_res_->NearbyImages();
 	InvalidateRect(NULL, FALSE);
 	return 0;
 }

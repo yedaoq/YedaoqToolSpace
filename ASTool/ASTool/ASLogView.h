@@ -31,6 +31,7 @@ public:
 		COMMAND_HANDLER(IDC_CMB_FILES, CBN_SELCHANGE, OnCbnSelchangeCmbFiles)
 		MESSAGE_HANDLER(WM_TIMER, OnTimer)
 		MESSAGE_HANDLER(WM_SIZE, OnSize)
+		MESSAGE_HANDLER(WM_DROPFILES, OnDropFiles)
 		COMMAND_HANDLER(IDC_BTN_REFRESH, BN_CLICKED, OnBnClickedBtnRefresh)
 		COMMAND_HANDLER(IDC_CMB_FILTER, CBN_EDITUPDATE, OnCbnEditupdateCmbFilter)
 		COMMAND_HANDLER(IDC_CMB_FILTER, CBN_SELCHANGE, OnCbnSelchangeCmbFilter)
@@ -106,4 +107,5 @@ public:
 	LRESULT OnCbnSelchangeCmbFilter(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnCbnSelendokCmbFilter(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnBnClickedBtnClear(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnDropFiles( UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled );
 };

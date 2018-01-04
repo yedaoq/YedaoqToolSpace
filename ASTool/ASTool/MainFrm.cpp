@@ -152,3 +152,39 @@ LRESULT CMainFrame::OnASImgFilelist( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*
 	view_as_img_.InitFileList();
 	return 0;
 }
+
+LRESULT CMainFrame::OnASRecordStart( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& bHandled )
+{
+	bHandled = TRUE;
+	bool succeed = (INVALID_HANDLE_VALUE != (HANDLE)lParam);
+	if (succeed)
+	{
+		MessageBox(TEXT("ÒÑ¿ªÊ¼Â¼Ïñ..."), TEXT("ASÂ¼Ïñ"), MB_OK);
+	}
+	else
+	{
+		MessageBox(TEXT("´´½¨Â¼ÏñÎÄ¼þÊ§°Ü£¬ÎÞ·¨Â¼Ïñ¡£"), TEXT("ASÂ¼Ïñ"), MB_OK);
+	}
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnASRecordStop( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled )
+{
+	bHandled = TRUE;
+	MessageBox(TEXT("ÒÑÍ£Ö¹Â¼Ïñ¡£"), TEXT("ASÂ¼Ïñ"), MB_OK);
+	return 0;
+}
+
+LRESULT CMainFrame::OnActivate( UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled )
+{
+	bHandled = TRUE;
+
+	if (WA_INACTIVE != wParam)
+	{
+		HMENU menu = GetMenu();
+		CheckWindowsMenuItem(menu, ID_ASIMG_ENABLE, IsToolRecordInstalled());
+	}
+
+	return 0;
+}

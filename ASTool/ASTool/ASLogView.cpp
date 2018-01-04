@@ -87,6 +87,8 @@ LRESULT CASLogView::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPar
 	pLoop->AddMessageFilter(this);
 	pLoop->AddIdleHandler(this);
 
+	DragAcceptFiles(TRUE);
+
 	UIAddChildWindowContainer(m_hWnd);
 
 	InitSciLexerCtrl();
@@ -416,6 +418,25 @@ LRESULT CASLogView::OnSize(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*
 		this->layout_main_->Layout(NSYedaoqLayout::LayoutPoint(1,1), NSYedaoqLayout::LayoutSize(LOWORD(lParam) - 2, HIWORD(lParam) - 2));
 		InvalidateRect(NULL, TRUE);
 	}
+	return 0;
+}
+
+LRESULT CASLogView::OnDropFiles( UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled )
+{
+	bHandled = TRUE;
+	TCHAR file_path[MAX_PATH * 2];
+	if(DragQueryFile((HDROP)wParam, 0, file_path, ARRAYSIZE(file_path)) > 0)
+	{
+		ctl_cmb_file_list_.SetWindowText(file_path);
+		if (!OpenLogFile(file_path))
+		{
+			MessageBox(file_path, TEXT("无法打开："), MB_OK);
+			return 0;
+		}
+
+		ClearLog();
+	}
+
 	return 0;
 }
 
